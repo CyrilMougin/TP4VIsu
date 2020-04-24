@@ -25,8 +25,8 @@ public:
         parent = prt;
     }
 
+    // Rechercher une valeur dans l'arbre
     bool search(int val) {
-        // Rechercher une valeur dans l'arbre
         BinarySearchTree* currentNode = this;
 
         // Parcourir jusqu'a une feuille
@@ -50,8 +50,8 @@ public:
         return false;
     }
 
+    // Inserer un nouvelle valeur dans l'arbre
     BinarySearchTree& insert(int val) {
-        // Inserer un nouvelle valeur dans l'arbre
         BinarySearchTree* currentNode = this;
         
         while(true) {
@@ -88,6 +88,7 @@ public:
         return *this;
     }
     
+    // Supprimer une valeur de l'arbre
     BinarySearchTree& remove(int val, BinarySearchTree* parentNode = NULL){
         BinarySearchTree* currentNode = this;
 
@@ -160,11 +161,11 @@ public:
                 break;
             }
         }    
-        return  *this;
+        return *this;
     }
 
+    // Retourne la valeur minimale de l'arbre
     int getMinValue() {
-        // Retourne la valeur minimale de l'arbre
         BinarySearchTree* currentNode = this;
 
         while(currentNode->left != NULL) {
@@ -174,8 +175,8 @@ public:
         return currentNode->value;
     }
 
+    // Retourne la valeur maximale de l'arbre
     int getMaxValue() {
-        // Retourne la valeur maximale de l'arbre
         BinarySearchTree* currentNode = this;
 
         while(currentNode->right != NULL) {

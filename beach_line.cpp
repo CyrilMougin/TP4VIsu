@@ -2,6 +2,7 @@
 // http://blog.ivank.net/fortunes-algorithm-and-implementation.html#impl_cpp
 
 #include <iostream>
+#include <vector>
 
 #include "binary_search_tree.cpp"
 
@@ -67,4 +68,37 @@ BinarySearchTree* right_child(BinarySearchTree* tree) {
     }
 
     return currentNode;
+}
+
+std::vector<BinarySearchTree*> beach_line(BinarySearchTree* tree) {
+	std::vector<BinarySearchTree*> leaf_data;
+	leaf_data.push_back(tree);
+
+	BinarySearchTree* current_node = tree;
+	BinarySearchTree* neighbor_left = left(current_node);
+
+	// Parcourir jusqu'a ce qu'il n'y ait plus de voisin a gauche (a partir du noeud courant)
+	while(current_node != neighbor_left) {
+		// Ajouter l'element au vecteur
+		leaf_data.push_back(neighbor_left);
+
+		// Mise a jour des valeurs
+		current_node = neighbor_left;
+		neighbor_left = left(current_node);
+	} 
+
+	current_node = tree;
+	BinarySearchTree* neighbor_right = right(current_node);
+
+	// Parcourir jusqu'a ce qu'il n'y ait plus de voisin a droite (a partir du noeud courant)
+	while(tree != neighbor_right) {
+		// Ajouter l'element au vecteur
+		leaf_data.push_back(neighbor_right);
+
+		// Mise a jour des valeurs
+		current_node = neighbor_right;
+		neighbor_right = right(current_node);
+	}
+
+	return leaf_data;
 }

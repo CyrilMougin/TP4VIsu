@@ -2,55 +2,64 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <map>
+#include <vector>
+
+#include "binary_search_tree.cpp"
+#include "beach_line.cpp"
  
-float get_bitch(int y, int sample);
+float get_beach(int y, int sample);
 float get_parable(int x, int p, int sample);
 float get_length(float y_data, float y_bitch);
 
-auto get_dict_value(int element);
-void set_dict_element(int element, int value);
-void del_dict_element(int element);
+std::vector<Data> init_vector(std::vector<Data> data, int sample);
 
 float set_datas_fortune(int sample);
-
-std::map<int, int> dictionary;
 
 typedef struct {
     GLfloat x, y, z;
 } Data;
 
-int main() {
-	int sample = 10;	
-}
-
 float set_datas_fortune(int sample) {
-	// Creer un 'vecteur' de datas pour les sources
-	/**
-	* Deja il faudrait remplir ce vecteur de donnees
-	* Mais je sais pas si c'est utile que ce soit de type 'Data'
-	* A moins que tu veuilles afficher les sources
-	*/
-	Data source_data[sample][1]; 
+	// Creer une vecteur de datas pour les sources & Ajouter des elements au vecteur
+	std::vector<Data> source_data = init_vector(source_data, sample);
+
+	// Creer un arbre binaire de recherche vide
+	BinarySearchTree* source_tree = new BinarySearchTree();
 	
 	// Plage qui descent d'une iteration chaque tour
 	for(int y = 0; y < sample; y++) {
 		float beach = get_beach(y, sample);
 		
-		for(int x = 0; x < sample; x++) {
-			if(source_data[x][0].y < beach) {
-				// Recuperer la distance entre la source et la plage
-				float length = get_length(source_data[x][0].y, beach);
-				
-				// Definir la parabole
-				float parable = get_parable(x, length, sample);
-
-				// Ajouter la parabole au dictionnaire
-				set_dict_element(x, y);
-				
+		for(int iter = 0; iter < source_data.size(); iter++) {
+			if(source_data[iter].y < beach) {
+				// Ajouter la source à l'arbre binaire de recherche
+				source_tree->insert(iter);	
 			}
 		}
+
+		for(int x = 0; x < sample; x++) {
+			// Recuperer la distance entre la source et la plage
+			float length = get_length(source_data[x].y, beach);
+			
+			// Definir la parabole
+			float parable = get_parable(x, length, sample);
+		}
 	}
+}
+
+std::vector<Data> init_vector(std::vector<Data> data, int sample) {
+	// Ajout de sources dans la liste
+	Data new_data;
+
+	for(int i = 0; i < 4; i++) {
+		new_data.x = (i - 0.5 * (double)sample) / (0.1 * (double)sample);
+		new_data.y = (i - 0.5 * (double)sample) / (0.1 * (double)sample);
+		new_data.z = 0;
+
+		data.push_back(new_data);
+	}
+	
+	return data;
 }
 
 float get_length(float y_data, float y_bitch) {
@@ -68,19 +77,4 @@ float get_parable(int x, int p, int sample) {
 float get_beach(int y, int sample) {
 	// Retroune la conversion dans l'espace {-5, 5} de la plage
 	return (y - 0.5 * (double)sample) / (0.1 * (double)sample);
-}
-
-auto get_dict_value(int element) {
-	// Retourne un element du dictionnaire
-	return dictionary.find(element);
-}
-
-void set_dict_element(int element, int value) {
-	// Ajoute un element dans le dictionnaire
-	dictionary.insert(std::make_pair(element, value));
-}
-
-void del_dict_element(int element) {
-	// Suppime un element dans le dictionnaire
-	dictionary.erase(element);
 }
