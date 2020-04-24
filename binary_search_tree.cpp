@@ -1,3 +1,6 @@
+// Inspire de : Binary Search Tree Implementation in C++ 
+// https://medium.com/@13dipty/binary-search-tree-implementation-in-c-537b9a9cedf8
+
 #include <iostream>
 
 class BinarySearchTree {
@@ -5,12 +8,21 @@ public:
     int value;                  // Cle de l'arbre
     BinarySearchTree* left;     // Sous-arbre gauche
     BinarySearchTree* right;    // Sous-arbre droit
+    BinarySearchTree* parent;   // Noeud parent
     
     // Initialsation d'un nouvelle arbre
-    BinarySearchTree(int val) {
+    BinarySearchTree() {
+        value = 0;
+        left = NULL;
+        right = NULL;
+        parent = NULL;
+    }
+
+    BinarySearchTree(int val, BinarySearchTree* prt) {
         value = val;
         left = NULL;
         right = NULL;
+        parent = prt;
     }
 
     bool search(int val) {
@@ -48,7 +60,7 @@ public:
                 // Parcourir le sous-arbre de gauche
                 if(currentNode->left == NULL) {
                     // Si on arrive a une feuille on creer un nouveau noeud et on insere la valeur
-                    BinarySearchTree* newNode = new BinarySearchTree(val);
+                    BinarySearchTree* newNode = new BinarySearchTree(val, currentNode);
                     currentNode->left = newNode;
 
                     break;
@@ -62,7 +74,7 @@ public:
                 // Parcourir le sous-arbre de droite
                 if(currentNode->right == NULL) {
                     // Si on arrive a une feuille on creer un nouveau noeud et on insere la valeur
-                    BinarySearchTree* newNode = new BinarySearchTree(val);
+                    BinarySearchTree* newNode = new BinarySearchTree(val, currentNode);
                     currentNode->right = newNode;
 
                     break;
