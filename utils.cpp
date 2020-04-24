@@ -13,7 +13,7 @@ float get_length(float y_data, float y_bitch);
 
 std::vector<Data> init_vector(std::vector<Data> data, int sample);
 
-float set_datas_fortune(int sample);
+double get_y_data(std::vector<Data> source_data, double x_data);
 
 typedef struct {
     GLfloat x, y, z;
@@ -25,6 +25,15 @@ float set_datas_fortune(int sample) {
 
 	// Creer un arbre binaire de recherche vide
 	BinarySearchTree* source_tree = new BinarySearchTree();
+
+	// Creer un vecteur avec toutes les feuilles de l'arbre
+	std::vector<BinarySearchTree*> leaf_data = beach_line(source_tree);
+
+	// Creer un vecteur avec tous les ecarts entre les feuilles et la plage
+	std::vector<float> length_data;
+
+	// Creer un vecteur avec l'ensemble des points constituant la ligne de plage
+	std::vector<Data> beachline_data;
 	
 	// Plage qui descent d'une iteration chaque tour
 	for(int y = 0; y < sample; y++) {
@@ -33,16 +42,55 @@ float set_datas_fortune(int sample) {
 		for(int iter = 0; iter < source_data.size(); iter++) {
 			if(source_data[iter].y < beach) {
 				// Ajouter la source à l'arbre binaire de recherche
-				source_tree->insert(iter);	
+				source_tree->insert(source_data[iter].x);
+
+				// Mise a jour de la ligne de plage
+				leaf_data = beach_line(source_tree);
 			}
 		}
 
-		for(int x = 0; x < sample; x++) {
-			// Recuperer la distance entre la source et la plage
-			float length = get_length(source_data[x].y, beach);
+		// Remplir le vecteur avec toutes les distances (source - plage) des feuilles
+		for(int iter = 0; iter < leaf_data.size(); iter++) {
+			Data leaf_point;
 			
-			// Definir la parabole
-			float parable = get_parable(x, length, sample);
+			leaf_point.x = leaf_data[iter]->value;
+			leaf_point.y = get_y_data(source_data, leaf_point.x);
+			leaf_point.z = 0;
+
+			// Recuperer la distance entre la source et la plage
+			length_data.push_back(get_length(leaf_point.y, beach));
+		}
+
+		for(int x = 0; x < sample; x++) {
+			Data beachline_point;
+
+			beachline_point.x = (x - 0.5 * (double)sample) / (0.1 * (double)sample);
+			beachline_point.y = 0;
+			beachline_point.z = 0;
+
+			for(int iter = 0; iter<leaf_data.size(); iter++) {
+				// Definir la parabole
+				float parable = get_parable(x, length_data[iter], sample);
+
+				// Recuperer la parabole la plus 'basse' en un point x
+				if(parable > beachline_point.y) {
+					beachline_point.y = parable;
+				}
+			}
+
+			// Ajouter le point au vecteur
+			beachline_data.push_back(beachline_point);
+		}
+	}
+}
+
+
+
+double get_y_data(std::vector<Data> source_data, double x_data) {
+	// Retoune la donnee 'y' affiliee a une donnee 'x'
+	for(auto iter = source_data.begin(); iter != source_data.end(); iter++) {
+		if(iter->x == x_data) {
+			return iter->y;
 		}
 	}
 }
