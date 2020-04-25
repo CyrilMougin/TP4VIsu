@@ -4,7 +4,11 @@
 #include "utils.cpp"
 
 int main() {
-    int sample = 2;
-    
+    std::cout << "Execution start" << std::endl;
+
+    int sample = 5;
+
     set_datas_fortune(sample);
+
+    std::cout << "Execution done" << std::endl;
 }

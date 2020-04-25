@@ -12,17 +12,17 @@ public:
     
     // Initialsation d'un nouvelle arbre
     BinarySearchTree() {
-        value = 0;
+        value = 42;
         left = NULL;
         right = NULL;
         parent = NULL;
     }
 
-    BinarySearchTree(int val, BinarySearchTree* prt) {
+    BinarySearchTree(int val) {
         value = val;
         left = NULL;
         right = NULL;
-        parent = prt;
+        parent = NULL;
     }
 
     // Rechercher une valeur dans l'arbre
@@ -50,6 +50,18 @@ public:
         return false;
     }
 
+    // Met a jour le fils et parent de deux noeuds
+	void SetLeft(BinarySearchTree* tree) {
+        this->left = tree;
+        tree->parent = this; 
+    }
+
+    // Met a jour le fils et parent de deux noeuds
+	void SetRight(BinarySearchTree* tree) {
+        this->right = tree;
+        tree->parent = this;
+    }
+
     // Inserer un nouvelle valeur dans l'arbre
     BinarySearchTree& insert(int val) {
         BinarySearchTree* currentNode = this;
@@ -60,8 +72,9 @@ public:
                 // Parcourir le sous-arbre de gauche
                 if(currentNode->left == NULL) {
                     // Si on arrive a une feuille on creer un nouveau noeud et on insere la valeur
-                    BinarySearchTree* newNode = new BinarySearchTree(val, currentNode);
-                    currentNode->left = newNode;
+                    BinarySearchTree* newNode = new BinarySearchTree(val);
+                    //currentNode->left = newNode;
+                    currentNode->SetLeft(newNode);
 
                     break;
                 }else {
@@ -70,18 +83,22 @@ public:
                 }
 
             // Checker si la valeur est superieure a celle du noeud courant
-            }else {
+            }else if(val > currentNode->value) {
                 // Parcourir le sous-arbre de droite
                 if(currentNode->right == NULL) {
                     // Si on arrive a une feuille on creer un nouveau noeud et on insere la valeur
-                    BinarySearchTree* newNode = new BinarySearchTree(val, currentNode);
-                    currentNode->right = newNode;
+                    BinarySearchTree* newNode = new BinarySearchTree(val);
+                    //currentNode->right = newNode;
+                    currentNode->SetRight(newNode);
 
                     break;
                 }else {
                     // Mettre a jour le noeud courant
                     currentNode = currentNode->right;
                 }
+            
+            }else {
+                break;
             }
         }
 
