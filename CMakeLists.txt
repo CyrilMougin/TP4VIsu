@@ -7,10 +7,12 @@ project(EX4
 set(CXX_STANDARD 17)
 
 add_subdirectory(build)
+add_subdirectory(glad)
 
 add_executable(TP4_exe main.cpp)
 
 target_link_libraries(TP4_exe
 	PRIVATE
 		build
+		glad
 )

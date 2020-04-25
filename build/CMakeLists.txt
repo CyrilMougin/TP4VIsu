@@ -1,7 +1,6 @@
 add_library(build
 	beach_line.cpp
 	binary_search_tree.cpp
-	glad/glad.c
 	utils.cpp		)
 	
 target_include_directories(build
