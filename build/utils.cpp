@@ -4,9 +4,12 @@
 #include <iostream>
 #include <vector>
 
-#include "binary_search_tree.cpp"
 #include "beach_line.cpp"
  
+typedef struct {
+    GLfloat x, y, z;
+} Data;
+
 float get_beach(int y, int sample);
 float get_parable(int x, int p, int sample);
 float get_length(float y_data, float y_bitch);
@@ -15,11 +18,7 @@ std::vector<Data> init_vector(std::vector<Data> data, int sample);
 
 double get_y_data(std::vector<Data> source_data, double x_data);
 
-typedef struct {
-    GLfloat x, y, z;
-} Data;
-
-float set_datas_fortune(int sample) {
+void set_datas_fortune(int sample) {
 	// Creer une vecteur de datas pour les sources & Ajouter des elements au vecteur
 	std::vector<Data> source_data = init_vector(source_data, sample);
 
@@ -93,6 +92,8 @@ double get_y_data(std::vector<Data> source_data, double x_data) {
 			return iter->y;
 		}
 	}
+
+	return -42;
 }
 
 std::vector<Data> init_vector(std::vector<Data> data, int sample) {

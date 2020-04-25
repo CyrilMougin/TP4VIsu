@@ -6,16 +6,6 @@
 
 #include "binary_search_tree.cpp"
 
-BinarySearchTree* left(BinarySearchTree* tree) {
-    // Retroune la plus proche feuille de gauche
-    return left_child(left_parent(tree));
-}
-
-BinarySearchTree* right(BinarySearchTree* tree) {
-    // Retroune la plus proche feuille de droite
-    return right_child(right_parent(tree));
-}
-
 BinarySearchTree* left_parent(BinarySearchTree* tree) {
     // Retourne le plus proche parent de gauche
     BinarySearchTree* parentNode = tree->parent;
@@ -68,6 +58,16 @@ BinarySearchTree* right_child(BinarySearchTree* tree) {
     }
 
     return currentNode;
+}
+
+BinarySearchTree* left(BinarySearchTree* tree) {
+    // Retroune la plus proche feuille de gauche
+    return left_child(left_parent(tree));
+}
+
+BinarySearchTree* right(BinarySearchTree* tree) {
+    // Retroune la plus proche feuille de droite
+    return right_child(right_parent(tree));
 }
 
 std::vector<BinarySearchTree*> beach_line(BinarySearchTree* tree) {
