@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <math.h>
 
 #include "beach_line.cpp"
  
@@ -106,7 +107,9 @@ void set_datas_fortune(int sample) {
 				// Definir la parabole
 				//std::cout << leaf_data[iter]->value << " | " << get_y_data(source_data, leaf_data[iter]->value) << std::endl;
 				//std::cout << beachline_point.x << std::endl;
-				float parable = get_parable(beachline_point.x + leaf_data[iter]->value, length_data[iter], sample) + get_y_data(source_data, leaf_data[iter]->value);
+				//float parable = get_parable(beachline_point.x + leaf_data[iter]->value, length_data[iter], sample) + get_y_data(source_data, leaf_data[iter]->value);
+				float parable = - get_parable(beachline_point.x - leaf_data[iter]->value, length_data[iter], sample) + get_y_data(source_data, leaf_data[iter]->value) + length_data[iter]/2;
+				//float parable = - get_parable(beachline_point.x, length_data[iter], sample);
 
 				// Recuperer la parabole la plus 'basse' en un point x
 				if(parable > beachline_point.y) {
@@ -149,7 +152,7 @@ std::vector<Data> init_vector(std::vector<Data> data, int sample) {
 
 	for(int i = 0; i < 4; i++) {
 		new_data.x = (i - 0.5 * (double)sample) / (0.1 * (double)sample);
-		new_data.y = -(i - 0.5 * (double)sample) / (0.1 * (double)sample);
+		new_data.y = (i - 0.5 * (double)sample) / (0.1 * (double)sample);
 		new_data.z = 0;
 
 		std::cout << "x : " << new_data.x << " | y : " << new_data.y << std::endl;
@@ -169,7 +172,7 @@ float get_length(float y_data, float y_bitch) {
 
 float get_parable(float x, int p, int sample) {
 	// Retourne la conversion dans l'espace {-5, 5} de l'equation de la parabole	
-	return x / (2 * p);
+	return pow(x, 2) / (2 * p);
 }
 
 float get_beach(int y, int sample) {
