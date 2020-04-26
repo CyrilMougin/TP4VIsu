@@ -6,7 +6,7 @@
 int main() {
     std::cout << "Execution start" << std::endl;
 
-    int sample = 5;
+    int sample = 10;
 
     set_datas_fortune(sample);
 
