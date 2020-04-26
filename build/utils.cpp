@@ -1,15 +1,9 @@
-#include "../glad/glad.h"
-#include <GLFW/glfw3.h>
-
 #include <iostream>
 #include <vector>
 #include <math.h>
 
 #include "beach_line.cpp"
- 
-typedef struct {
-    GLfloat x, y, z;
-} Data;
+#include "voronoi.cpp"
 
 float get_beach(int y, int sample);
 float get_parable(float x, int p, int sample);
@@ -39,7 +33,7 @@ void set_datas_fortune(int sample) {
 	std::vector<BinarySearchTree*> leaf_data = beach_line(source_tree);
 	//std::vector<BinarySearchTree*> leaf_data;
 	
-	// Plage qui descent d'une iteration chaque tour
+	// Plage qui descend d'une iteration chaque tour
 	for(int y = 0; y < 2 * sample + 2; y++) {
 		std::cout << "########## Descente de la plage ##########" << std::endl;
 		float beach = get_beach(y, sample);
@@ -47,9 +41,6 @@ void set_datas_fortune(int sample) {
 		
 		for(int iter = 0; iter < source_data.size(); iter++) {
 			if(source_data[iter].y < beach && !source_tree->search(source_data[iter].x)) {
-				/*
-				FAIRE EN SORTE QUE ON N'AJOUTE PAS DEUX FOIS UNE DONNE
-				*/
 				// Ajouter la source à l'arbre binaire de recherche
 				source_tree->insert(source_data[iter].x);
 
@@ -165,9 +156,9 @@ std::vector<Data> init_vector(std::vector<Data> data, int sample) {
 	return data;
 }
 
-float get_length(float y_data, float y_bitch) {
+float get_length(float y_data, float y_beach) {
 	// Retourne la distance entre la source et la plage
-	return y_bitch - y_data;
+	return y_beach - y_data;
 }
 
 float get_parable(float x, int p, int sample) {
