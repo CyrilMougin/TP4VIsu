@@ -39,19 +39,19 @@ public:
         right = 0;
     }
 
-    // Met a jour le fils et parent de deux noeuds
 	void SetLeft(BeachLine* tree) {
+        // Met a jour le fils et parent de deux noeuds
         this->left = tree;
         tree->parent = this; 
     }
 
-    // Met a jour le fils et parent de deux noeuds
 	void SetRight(BeachLine* tree) {
+        // Met a jour le fils et parent de deux noeuds
         this->right = tree;
         tree->parent = this;
     }
 
-    BeachLine* left_parent(BeachLine* line) {
+    BeachLine* get_left_parent(BeachLine* line) {
         // Retourne le plus proche parent de gauche
         BeachLine* parentNode = line->parent;
         BeachLine* currentNode = line;
@@ -66,7 +66,7 @@ public:
         return parentNode;      
     }
 
-    BeachLine* right_parent(BeachLine* line) {
+    BeachLine* get_right_parent(BeachLine* line) {
         // Retourne le plus proche parent de droite
         BeachLine* parentNode = line->parent;
         BeachLine* currentNode = line;
@@ -81,7 +81,7 @@ public:
         return parentNode;      
     }
 
-    BeachLine* left_child(BeachLine* line) {
+    BeachLine* get_left_child(BeachLine* line) {
         if(!line) {
             return 0;
 
@@ -98,7 +98,7 @@ public:
         }
     }
 
-    BeachLine* right_child(BeachLine* line) {
+    BeachLine* get_right_child(BeachLine* line) {
         if(!line) {
             return 0;
     
@@ -115,14 +115,14 @@ public:
         }
     }
 
-    BeachLine* left(BeachLine* line) {
+    BeachLine* get_left(BeachLine* line) {
         // Retroune la plus proche feuille de gauche
-        return left_child(left_parent(line));
+        return get_left_child(get_left_parent(line));
     }
 
-    BeachLine* right(BeachLine* line) {
+    BeachLine* get_right(BeachLine* line) {
         // Retroune la plus proche feuille de droite
-        return right_child(right_parent(line));
+        return get_right_child(get_right_parent(line));
     }
 
 };

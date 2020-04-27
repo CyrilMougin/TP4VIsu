@@ -13,6 +13,7 @@
 
 #include "edge.cpp"
 #include "event.cpp"
+#include "beach_line.cpp"
 
 float length(Data beachline_point, Data source_point);
 
@@ -114,6 +115,12 @@ void handle_site_event(Point* site) {
 
     Edge* xl = new Edge(start, parable->site, site);
     Edge* xr = new Edge(start, site, parable->site);
+
+    xl->twin = xr;
+
+    parable->edge = xr;
+    parable->is_a_leaf = false;
+    parable->left->edge = xl;
     
     // Verifier que les nouveau triplets d'arcs consecutifs avec l'arc associe situes en dessous (a) ou au dessus (c)
     // correspondent a deux aretes convergentes
@@ -123,6 +130,14 @@ void handle_site_event(Point* site) {
 }
 
 void check_circle_event(BeachLine* parable) {
+    BeachLine* l = parable->get_left(parable);
+    BeachLine* r = parable->get_right(parable);
+
+    if(!l || !r || l->site == r->site) {
+        return;
+    }
+
+    
 
 }
 
