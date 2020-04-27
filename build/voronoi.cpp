@@ -1,3 +1,8 @@
+// Inspire de : 
+// Fortune’s algorithm and implementation : http://blog.ivank.net/fortunes-algorithm-and-implementation.html#impl_cpp
+// Geometrie Algorithmique : http://www.cgeo.ulg.ac.be/CG/CG_07.pdf
+// Diagramme de Voronoi : https://perso.telecom-paristech.fr/dufourd/pact_archives/projet-2011-52/le-projet/avancement/solution-simplifiee/diagramme-de-voronoi/
+
 #include <iostream>
 #include <list>
 #include <vector>
@@ -104,10 +109,20 @@ void handle_site_event(Point* site) {
     parable->left->left = a;
     parable->left->right = b;
 
+    // Créer deux nouvelles demi-arêtes dans le DCEL
     Point* start = new Point(site->point.x, get_y_parable(parable->site, site->point.x));
 
     Edge* xl = new Edge(start, parable->site, site);
     Edge* xr = new Edge(start, site, parable->site);
+    
+    // Verifier que les nouveau triplets d'arcs consecutifs avec l'arc associe situes en dessous (a) ou au dessus (c)
+    // correspondent a deux aretes convergentes
+    check_circle_event(a);
+    check_circle_event(c);
+
+}
+
+void check_circle_event(BeachLine* parable) {
 
 }
 

@@ -5,8 +5,8 @@ Triangulation
 [Sources](https://github.com/CyrilMougin/TP4VIsu/tree/broj/docs/Sources.md) du TP
 
 ## Execution
->> mkdir "nomDuDossier"
->> cd "nomDuDossier"
->> cmake ..
->> make
->> ./TP4_exe
+        mkdir "nomDuDossier"
+        cd "nomDuDossier"
+        cmake ..
+        make
+        ./TP4_exe

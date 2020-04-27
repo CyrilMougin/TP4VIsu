@@ -1,5 +1,5 @@
-// Inspire de : Binary Search Tree Implementation in C++ 
-// https://medium.com/@13dipty/binary-search-tree-implementation-in-c-537b9a9cedf8
+// Inspire de : 
+// Binary Search Tree Implementation in C++ : https://medium.com/@13dipty/binary-search-tree-implementation-in-c-537b9a9cedf8
 
 #include <iostream>
 
