@@ -4,148 +4,125 @@
 #include <iostream>
 #include <vector>
 
-#include "binary_search_tree.cpp"
+#include "edge.cpp"
 
-BinarySearchTree* left_parent(BinarySearchTree* tree) {
-    //std::cout << "3.3.1" << std::endl;
-    // Retourne le plus proche parent de gauche
-    BinarySearchTree* parentNode = tree->parent;
-    BinarySearchTree* currentNode = tree;
-    //std::cout << "3.3.2" << std::endl;
-    //std::cout << "parent : " << parentNode << " | parent gauche : " << parentNode->left << " | courant : " << currentNode << std::endl;
-    // Parcourir jusqu'a ce que le sous-arbre gauche du parent ne soit plus le noeud courant
-    while (parentNode->left == currentNode && parentNode->parent->value != 42) {
-        //std::cout << "3.3.3" << std::endl;
-        // Mise a jour des variables
-        currentNode = parentNode;
-        parentNode = parentNode->parent;
+class BeachLine {
+public:
+    Point* site;                // Site associe a la parabole
+
+    bool is_a_leaf;             // Definis si c'est une feuille (true) ou pas (false)
+
+    Event* circle_event;   //
+    Edge* edge;                 // Bord associe a la parabole
+
+    BeachLine* parent;          // Parent (vis a vis de l'arbre de recherche binaire)
+    BeachLine* left;            // Sous-arbre gauche (vis a vis de l'arbre de recherche binaire)
+    BeachLine* right;           // Sous-arbre droit (vis a vis de l'arbre de recherche binaire)
+
+    BeachLine() {
+        site = 0;
+        is_a_leaf = false;
+        circle_event = 0;
+        edge = 0;
+        parent = 0;
+        left = 0;
+        right = 0;
     }
 
-    return parentNode;      
-}
-
-BinarySearchTree* right_parent(BinarySearchTree* tree) {
-    // Retourne le plus proche parent de droite
-    BinarySearchTree* parentNode = tree->parent;
-    BinarySearchTree* currentNode = tree;
-
-    // Parcourir jusqu'a ce que le sous-arbre droit du parent ne soit plus le noeud courant
-    while (parentNode->right == currentNode && parentNode->parent->value != 42) {
-        // Mise a jour des variables
-        currentNode = parentNode;
-        parentNode = parentNode->parent;
+    BeachLine(Point* site_data) {
+        site = site_data;
+        is_a_leaf = true;
+        circle_event = 0;
+        edge = 0;
+        parent = 0;
+        left = 0;
+        right = 0;
     }
 
-    return parentNode;      
-}
+    // Met a jour le fils et parent de deux noeuds
+	void SetLeft(BeachLine* tree) {
+        this->left = tree;
+        tree->parent = this; 
+    }
 
-BinarySearchTree* left_child(BinarySearchTree* tree) { 
-    //std::cout << "3.3.4" << std::endl;
-    if(tree->left != NULL) {
-        // Retourne le plus proche enfant (a gauche du noeud courant)     
-        BinarySearchTree* currentNode = tree->left;
+    // Met a jour le fils et parent de deux noeuds
+	void SetRight(BeachLine* tree) {
+        this->right = tree;
+        tree->parent = this;
+    }
 
-        // Parcourir jusqu'a tomber sur une feuille
-        while (currentNode->left != NULL && currentNode->right != NULL) {
-            currentNode = currentNode->right;
+    BeachLine* left_parent(BeachLine* line) {
+        // Retourne le plus proche parent de gauche
+        BeachLine* parentNode = line->parent;
+        BeachLine* currentNode = line;
+
+        // Parcourir jusqu'a ce que le sous-arbre gauche du parent ne soit plus le noeud courant
+        while (parentNode->left == currentNode) {
+            // Mise a jour des variables
+            currentNode = parentNode;
+            parentNode = parentNode->parent;
         }
 
-        return currentNode;
-    
-    }else {
-        return tree;
+        return parentNode;      
     }
-}
 
-BinarySearchTree* right_child(BinarySearchTree* tree) {
-    if(tree->right != NULL) {    
-        // Retroune le plus proche enfant (a droite du noeud courant) 
-        BinarySearchTree* currentNode = tree->right;
+    BeachLine* right_parent(BeachLine* line) {
+        // Retourne le plus proche parent de droite
+        BeachLine* parentNode = line->parent;
+        BeachLine* currentNode = line;
 
-        // Parcourir jusqu'a tomber sur une feuille
-        while (currentNode->left != NULL && currentNode->right != NULL) {
-            currentNode = currentNode->left;
+        // Parcourir jusqu'a ce que le sous-arbre droit du parent ne soit plus le noeud courant
+        while (parentNode->right == currentNode) {
+            // Mise a jour des variables
+            currentNode = parentNode;
+            parentNode = parentNode->parent;
         }
- 
-        return currentNode;
 
-    }else {
-        return tree;
-    }
-}
-
-BinarySearchTree* left(BinarySearchTree* tree) {
-    // Retroune la plus proche feuille de gauche
-    return left_child(left_parent(tree));
-}
-
-BinarySearchTree* right(BinarySearchTree* tree) {
-    // Retroune la plus proche feuille de droite
-    return right_child(right_parent(tree));
-}
-
-std::vector<BinarySearchTree*> beach_line(BinarySearchTree* tree) {
-    //std::cout << "3.1" << std::endl;
-	std::vector<BinarySearchTree*> leaf_data;
-	leaf_data.push_back(tree);
-
-    if(tree->parent != NULL) {
-        if(tree->parent->value != 42) {
-            //std::cout << "3.2" << std::endl;
-            BinarySearchTree* current_node = tree;
-            BinarySearchTree* neighbor_left = left(current_node);
-            
-            // Parcourir jusqu'a ce qu'il n'y ait plus de voisin a gauche (a partir du noeud courant)
-            while(current_node != neighbor_left && neighbor_left->left == NULL && neighbor_left->right == NULL) {
-                //std::cout << "3.2.1" << std::endl;
-                // Ajouter l'element au vecteur
-                leaf_data.push_back(neighbor_left);
-
-                // Mise a jour des valeurs
-                current_node = neighbor_left;
-                neighbor_left = left(current_node);
-            } 
-
-            current_node = tree;
-            BinarySearchTree* neighbor_right = right(current_node);
-
-            // Parcourir jusqu'a ce qu'il n'y ait plus de voisin a droite (a partir du noeud courant)
-            while(current_node != neighbor_right && neighbor_right->right == NULL && neighbor_right->left == NULL) {
-                //std::cout << "3.2.2" << std::endl;
-                // Ajouter l'element au vecteur
-                leaf_data.push_back(neighbor_right);
-
-                // Mise a jour des valeurs
-                current_node = neighbor_right;
-                neighbor_right = right(current_node);
-            }
-        }
+        return parentNode;      
     }
 
-	return leaf_data;
-}
+    BeachLine* left_child(BeachLine* line) {
+        if(!line) {
+            return 0;
 
-// Rechercher une valeur dans l'arbre
-BinarySearchTree* search(BinarySearchTree* tree, int val) {
-    BinarySearchTree* currentNode = tree;
-
-    // Parcourir jusqu'a une feuille
-    while(currentNode != NULL) {
-        // Checker si la valeur est inférieure a celle du noeud courant
-        if(val < currentNode->value) {
-            // Mettre a jour le noeud courant (cote sous-arbre gauche)
-            currentNode = currentNode->left;
-
-        // Checker si la valeur est superieure a celle du noeud courant
-        }else if(val > currentNode->value) {
-            // Mettre a jour le noeud courant (cote sous-arbre droit)
-            currentNode = currentNode->right;
-        
-        // Valeur trouvee
         }else {
+            // Retourne le plus proche enfant (a gauche du noeud courant)     
+            BeachLine* currentNode = line->left;
+
+            // Parcourir jusqu'a tomber sur une feuille
+            while (currentNode->left != NULL && currentNode->right != NULL) {
+                currentNode = currentNode->right;
+            }
+
             return currentNode;
         }
     }
+
+    BeachLine* right_child(BeachLine* line) {
+        if(!line) {
+            return 0;
     
-    return NULL;
-}
+        }else {  
+            // Retroune le plus proche enfant (a droite du noeud courant) 
+            BeachLine* currentNode = line->right;
+
+            // Parcourir jusqu'a tomber sur une feuille
+            while (currentNode->left != NULL && currentNode->right != NULL) {
+                currentNode = currentNode->left;
+            }
+
+            return currentNode;
+        }
+    }
+
+    BeachLine* left(BeachLine* line) {
+        // Retroune la plus proche feuille de gauche
+        return left_child(left_parent(line));
+    }
+
+    BeachLine* right(BeachLine* line) {
+        // Retroune la plus proche feuille de droite
+        return right_child(right_parent(line));
+    }
+
+};

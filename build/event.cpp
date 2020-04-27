@@ -1,0 +1,18 @@
+#include <iostream>
+
+#include "point.cpp"
+
+class Event {
+public:
+
+	Point* point;           // Point affilie a l'evenement
+	bool is_a_site_event;   // Booleen signifiant si l'element est un site (true) ou pas (false)
+	float y;                // Coordonnee affiliee au point
+
+	Event(Point* a_data, bool iase)
+	{
+		point = a_data;
+		is_a_site_event = iase;
+		y = a_data->point.y;
+	}
+};
