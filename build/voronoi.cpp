@@ -16,13 +16,19 @@
 #include "event.cpp"
 #include "beach_line.cpp"
 
+int width;
+int height;
+
 float y_beach;
 std::priority_queue<Event*> queue;
 std::set<Event*> set_events_deleted;
 BeachLine* line;
 
-void voronoi_diagram(std::set<Point*>* set_sites) {
+void voronoi_diagram(std::set<Point*>* set_sites, int w, int h) {
     // Corps de l'algorithme de Fortune
+
+    width = w;
+	height = h;
 
     // Initialiser la queue Q en fonction des valeurs y (ordre decroissant) 
     for(auto site = set_sites->begin(); site != set_sites->end(); site++) {
