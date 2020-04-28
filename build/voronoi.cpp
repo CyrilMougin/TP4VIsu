@@ -109,7 +109,16 @@ void handle_circle_event(BeachLine* parable) {
         r->circle_event = 0;
     }
 
-    
+    Point* s = new Point(parable->circle_event->point->point.x, get_y_parable(l->site, parable->circle_event->point->point.x));
+
+    Edge* xl = parable->get_left_parent(parable)->edge;
+    Edge* xr = parable->get_right_parent(parable)->edge;
+
+    xl->finish = s;
+    xr->finish = s;
+
+    check_circle_event(l);
+    check_circle_event(r);
 }
 
 void check_circle_event(BeachLine* parable) {
