@@ -1,8 +1,8 @@
 // Inspire de : 
-// Fortune’s algorithm and implementation : http://blog.ivank.net/fortunes-algorithm-and-implementation.html#impl_cpp
+// Fortune’s algorithm and implementation : http://blog.ivank.net/fortunes-algorithm-and-implementation.html
 // Geometrie Algorithmique : http://www.cgeo.ulg.ac.be/CG/CG_07.pdf
 // Diagramme de Voronoi : https://perso.telecom-paristech.fr/dufourd/pact_archives/projet-2011-52/le-projet/avancement/solution-simplifiee/diagramme-de-voronoi/
-// Intersection entre deux droite : https://calculis.net/intersection
+// Intersection entre deux droites : https://calculis.net/intersection
 
 #include <iostream>
 #include <list>
@@ -22,6 +22,7 @@ std::set<Event*> set_events_deleted;
 BeachLine* line;
 
 void voronoi_diagram(std::set<Point*>* set_sites) {
+    // Corps de l'algorithme de Fortune
 
     // Initialiser la queue Q en fonction des valeurs y (ordre decroissant) 
     for(auto site = set_sites->begin(); site != set_sites->end(); site++) {
@@ -32,7 +33,7 @@ void voronoi_diagram(std::set<Point*>* set_sites) {
     std::list<Edge*> list_edges;
 
     while(!queue.empty()) {
-        // Recuperer le primer element de la queue et l'enlever de cette derniere
+        // Recuperer le premier element de la queue et l'enlever de cette derniere
         Event* event = queue.top();
         queue.pop();
 
@@ -44,13 +45,14 @@ void voronoi_diagram(std::set<Point*>* set_sites) {
 
         }else {
             std::cout << "L'element n'est pas un site" << std::endl;
+
+            handle_circle_event(event->parable);
         }
     }
 
 }
 
 void handle_site_event(Point* site) {
-
     // Si l'abre est vide, on ajoute le site a l'arbre (qui sera donc la racine)
     if(!line) {
         line = new BeachLine(site);
@@ -94,6 +96,20 @@ void handle_site_event(Point* site) {
     check_circle_event(a);
     check_circle_event(c);
 
+}
+
+void handle_circle_event(BeachLine* parable) {
+    BeachLine* l = parable->get_left(parable);
+    BeachLine* r = parable->get_right(parable);
+
+    if(l->circle_event) {
+        l->circle_event = 0;
+    }
+    if(r->circle_event) {
+        r->circle_event = 0;
+    }
+
+    
 }
 
 void check_circle_event(BeachLine* parable) {
@@ -166,7 +182,7 @@ float get_length_beach(float y_data, float y_beach) {
 }
 
 float get_y_parable(Point* point, float x) {
-	// Retourne 'y' vis a vis de l'equation de la parabole
+	// Retourne la valeur de 'y' vis a vis de l'equation de la parabole
     
     float p = get_length_beach(point->point.y, y_beach);
 

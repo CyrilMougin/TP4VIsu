@@ -11,15 +11,16 @@ Construction de l'arbre binaire de recherche avec toutes les fonctions qui lui s
 
 ## "beach_line.cpp"
 Inspiré de :
-- [Fortune’s algorithm and implementation](http://blog.ivank.net/fortunes-algorithm-and-implementation.html#impl_cpp)
+- [Fortune’s algorithm and implementation](http://blog.ivank.net/fortunes-algorithm-and-implementation.html)
 
 Parcours de l'arbre binaire de recherche pour trouver toutes les feuilles à partir de l'une d'entre elle.
 
 ## "voronoi.cpp"
 Inspiré de :
-- [Fortune’s algorithm and implementation](http://blog.ivank.net/fortunes-algorithm-and-implementation.html#impl_cpp)
+- [Fortune’s algorithm and implementation](http://blog.ivank.net/fortunes-algorithm-and-implementation.html)
 - [Geometrie Algorithmique](http://www.cgeo.ulg.ac.be/CG/CG_07.pdf)
 - [Diagramme de Voronoi](https://perso.telecom-paristech.fr/dufourd/pact_archives/projet-2011-52/le-projet/avancement/solution-simplifiee/diagramme-de-voronoi/)
+- [Intersection entre deux droites](https://calculis.net/intersection)
 
 Implémentation de l'algorithme de Fortune avec les fonctions principales affiliées :
 - Parcours de chaque site présents.

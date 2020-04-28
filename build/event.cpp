@@ -1,5 +1,5 @@
 // Inspire de : 
-// Fortune’s algorithm and implementation : http://blog.ivank.net/fortunes-algorithm-and-implementation.html#impl_cpp
+// Fortune’s algorithm and implementation : http://blog.ivank.net/fortunes-algorithm-and-implementation.html
 
 #include <iostream>
 
