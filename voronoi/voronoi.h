@@ -1,3 +1,4 @@
+#include <list>
 #include <queue>
 #include <set>
 
@@ -5,35 +6,83 @@
 #include "edge.h"
 #include "beach_line.h"
 #include "event.h"
+#include <functional>
 
-class Voronoi {
-public:
-    // VARIABLES
-    int width;
-    int height;
+namespace vor {
 
-    float y_beach;
-    std::priority_queue<Event*> queue;
-    std::set<Event*> set_events_deleted;
-    BeachLine* line;
-    std::list<Edge*> list_edges;
+	typedef std::list<Point*>		Vertices;
+	typedef std::list<Edge*>		Edges;
 
-    // CONSTRUCTEUR
-    Voronoi();
 
-    // METHODES
-    std::list<Edge*> voronoi_diagram(std::set<Point*> set_sites, int w, int h);
-    void handle_site_event(Point* site);
-    void handle_circle_event(BeachLine* parable);
-    void check_circle_event(BeachLine* parable);
-    BeachLine* search(BeachLine* line, int val);
-    float get_length_site(Point* s, Point* site);
-    float get_length_beach(float y_data, float y_beach);
-    float get_y_parable(Point* point, float x);
-    Point* get_edge_intersection(Edge* xl, Edge* xr);
 
-    void FinishEdge(BeachLine* n);
-    double GetXOfEdge(BeachLine* par, double y);
-    BeachLine* GetParabolaByX(double xx);
-    
-};
+	class Voronoi
+	{
+	public:
+
+		/*
+			Constructor - without any parameters
+		*/
+
+		Voronoi();
+
+		/*
+			The only public function for generating a diagram
+			input:
+				v		: Vertices - places for drawing a diagram
+				w		: width  of the result (top left corner is (0, 0))
+				h		: height of the result
+			output:
+				pointer to list of edges
+			All the data structures are managed by this class
+		*/
+
+		Edges* GetEdges(Vertices* v, int w, int h);
+
+	private:
+
+		/*
+						places		: container of places with which we work
+						edges		: container of edges which will be teh result
+						width		: width of the diagram
+						height		: height of the diagram
+						root		: the root of the tree, that represents a beachline sequence
+						ly			: current "y" position of the line (see Fortune's algorithm)
+		*/
+
+		Vertices* places;
+		Edges* edges;
+		double			width, height;
+		BeachLine* root;
+		double			ly;
+
+		/*
+						deleted		: set  of deleted (false) Events (since we can not delete from PriorityQueue
+						points		: list of all new points that were created during the algorithm
+						queue		: priority queue with events to process
+		*/
+
+		std::set<Event*>	deleted;
+		std::list<Point*> points;
+		std::priority_queue<Event*, std::vector<Event*>, Event::CompareEvent> queue;
+
+		/*
+						InsertParabola		: processing the place event
+						RemoveParabola		: processing the circle event
+						FinishEdge			: recursively finishes all infinite edges in the tree
+						GetXOfEdge			: returns the current x position of an intersection point of left and right parabolas
+						GetParabolaByX		: returns the Parabola that is under this "x" position in the current beachline
+						CheckCircle			: checks the circle event (disappearing) of this parabola
+						GetEdgeInterse
+		*/
+
+		void		InsertParabola(Point* p);
+		void		RemoveParabola(Event* e);
+		void		FinishEdge(BeachLine* n);
+		double		GetXOfEdge(BeachLine* par, double y);
+		BeachLine* GetParabolaByX(double xx);
+		double		GetY(Point* p, double x);
+		void		CheckCircle(BeachLine* b);
+		Point* GetEdgeIntersection(Edge* a, Edge* b);
+	};
+
+}

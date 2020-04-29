@@ -4,22 +4,33 @@
 
 #include "voronoi/voronoi.h"
 
+vor::Voronoi * v;
+vor::Vertices * ver;
+vor::Vertices * dir;
+vor::Edges * edg;
+
+double width = 5;
+double height = 5;
+
 int main() {
     std::cout << "Execution start" << std::endl;
 
-    int width = 20;
-    int height = 20;
-    std::set<Point*> set_points;
-    Voronoi* voronoi = new Voronoi();
-    std::list<Edge*> list_edges;
+    using namespace vor;
 
-    for (int i = 0; i < 2; i++) {
-        Point* new_data = new Point(4 * i, 4 * i);
+    v = new Voronoi();
+	ver = new Vertices();
+	dir = new Vertices();
 
-        set_points.insert(new_data);
+    for (int i = 0; i < 3; i++) {
+        //Point* new_data = new Point(4 * i, 4 * i);
+
+        //ver->push_back(new_data);
+
+        ver->push_back(new Point( width * (double)rand()/(double)RAND_MAX , height * (double)rand()/(double)RAND_MAX )); 
+		dir->push_back(new Point( (double)rand()/(double)RAND_MAX - 0.5, (double)rand()/(double)RAND_MAX - 0.5));
     }
 
-    for (auto point = set_points.begin(); point != set_points.end(); point++) {
+    for (auto point = ver->begin(); point != ver->end(); point++) {
         Point* new_data = *point;
 
         std::cout << "x : " << new_data->x  << " | y : " << new_data->y << std::endl;
@@ -27,10 +38,10 @@ int main() {
     }
     
     std::cout << "Voronoi start" << std::endl;
-    list_edges = voronoi->voronoi_diagram(set_points, width, height);
+    edg = v->GetEdges(ver, width, height);
     std::cout << "Voronoi done" << std::endl;
 
-    for(auto edge = list_edges.begin(); edge != list_edges.end(); edge++) {
+    for(auto edge = edg->begin(); edge != edg->end(); edge++) {
 		Edge* new_edge = *edge;
 
         if( new_edge->start == 0) {

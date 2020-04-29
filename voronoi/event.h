@@ -8,7 +8,7 @@ public:
 	// VARIABLES
 	Point* point;           // Point affilie a l'evenement
 	bool is_a_site_event;   // Booleen signifiant si l'element est un site (true) ou pas (false)
-	float y;                // Coordonnee affiliee au point
+	double y;                // Coordonnee affiliee au point
 	BeachLine* parable;		// Parabole associee a l'evenement
 
 	// CONSTRUCTEUR
@@ -19,4 +19,9 @@ public:
 		y = a_data->y;
 		parable = 0;
 	}
+
+	struct CompareEvent : public std::binary_function<Event*, Event*, bool>
+	{
+		bool operator()(const Event* l, const Event* r) const { return (l->y < r->y); }
+	};
 };

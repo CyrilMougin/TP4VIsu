@@ -9,8 +9,6 @@ BeachLine::BeachLine() {
     circle_event = 0;
     edge = 0;
     parent = 0;
-    left = 0;
-    right = 0;
 }
 
 BeachLine::BeachLine(Point* site_data) {
@@ -19,18 +17,6 @@ BeachLine::BeachLine(Point* site_data) {
     circle_event = 0;
     edge = 0;
     parent = 0;
-    left = 0;
-    right = 0;
-}
-
-void BeachLine::SetLeft(BeachLine* tree) {
-    this->left = tree;
-    tree->parent = this; 
-}
-
-void BeachLine::SetRight(BeachLine* tree) {
-    this->right = tree;
-    tree->parent = this;
 }
 
 BeachLine* BeachLine::get_left_parent(BeachLine* line) {
@@ -40,13 +26,13 @@ BeachLine* BeachLine::get_left_parent(BeachLine* line) {
     std::cout << "2.1" << std::endl;
     // Cas de la racine
     std::cout << parentNode << std::endl;
-    if (!parentNode) {
+    /*if (!parentNode) {
         std::cout << "2.3" << std::endl;
         return 0;
-    }
+    }*/
 
     // Parcourir jusqu'a ce que le sous-arbre gauche du parent ne soit plus le noeud courant
-    while (parentNode->left == currentNode) {
+    while (parentNode->Left() == currentNode) {
         std::cout << "2.2" << std::endl;
         // Cas de la racine
         if (!parentNode->parent) {
@@ -67,13 +53,13 @@ BeachLine* BeachLine::get_right_parent(BeachLine* line) {
     BeachLine* currentNode = line;
 
     // Cas de la racine
-    if (!parentNode) {
+    /*if (!parentNode) {
         std::cout << "2.3" << std::endl;
         return 0;
-    }
+    }*/
 
     // Parcourir jusqu'a ce que le sous-arbre droit du parent ne soit plus le noeud courant
-    while (parentNode->right == currentNode) {
+    while (parentNode->Right() == currentNode) {
         // Cas de la racine
         if (!parentNode->parent) {
             return 0;
@@ -96,11 +82,11 @@ BeachLine* BeachLine::get_left_child(BeachLine* line) {
     }else {
         std::cout << "3.2" << std::endl;
         // Retourne le plus proche enfant (a gauche du noeud courant)     
-        BeachLine* currentNode = line->left;
+        BeachLine* currentNode = line->Left();
         std::cout << "3.3" << std::endl;
         // Parcourir jusqu'a tomber sur une feuille
         while (!currentNode->is_a_leaf) {
-            currentNode = currentNode->right;
+            currentNode = currentNode->Right();
         }
         std::cout << "3.4" << std::endl;
         return currentNode;
@@ -113,11 +99,11 @@ BeachLine* BeachLine::get_right_child(BeachLine* line) {
 
     }else {  
         // Retroune le plus proche enfant (a droite du noeud courant) 
-        BeachLine* currentNode = line->right;
+        BeachLine* currentNode = line->Right();
 
         // Parcourir jusqu'a tomber sur une feuille
         while (!currentNode->is_a_leaf) {
-            currentNode = currentNode->left;
+            currentNode = currentNode->Left();
         }
 
         return currentNode;

@@ -3,15 +3,11 @@
 
 #include <iostream>
 
-typedef struct {
-    GLfloat x, y;
-} Data;
-
 class Point {
 public :
     // VARIABLE
-    //Data point;
-    GLfloat x, y;
+    double x; 
+    double y;
 
     // CONSTRUCTEUR
     Point(float data_x, float data_y) {
