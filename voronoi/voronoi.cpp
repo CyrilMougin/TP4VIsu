@@ -9,29 +9,19 @@
 #include <vector>
 #include <algorithm>
 #include <math.h>
-#include <queue>
-#include <set>
 
-#include "edge.cpp"
-#include "event.cpp"
-#include "beach_line.cpp"
+#include "voronoi.h"
 
-int width;
-int height;
+Voronoi::Voronoi() {}
 
-float y_beach;
-std::priority_queue<Event*> queue;
-std::set<Event*> set_events_deleted;
-BeachLine* line;
-
-void voronoi_diagram(std::set<Point*>* set_sites, int w, int h) {
+void Voronoi::voronoi_diagram(std::set<Point*> set_sites, int w, int h) {
     // Corps de l'algorithme de Fortune
 
     width = w;
 	height = h;
 
     // Initialiser la queue Q en fonction des valeurs y (ordre decroissant) 
-    for(auto site = set_sites->begin(); site != set_sites->end(); site++) {
+    for(auto site = set_sites.begin(); site != set_sites.end(); site++) {
         queue.push(new Event(*site, true));
     }
 
@@ -42,6 +32,8 @@ void voronoi_diagram(std::set<Point*>* set_sites, int w, int h) {
         // Recuperer le premier element de la queue et l'enlever de cette derniere
         Event* event = queue.top();
         queue.pop();
+
+        std::cout << event->y << std::endl;
 
         // Verifier si l'element est un site
         if(event->is_a_site_event) {
@@ -58,7 +50,7 @@ void voronoi_diagram(std::set<Point*>* set_sites, int w, int h) {
 
 }
 
-void handle_site_event(Point* site) {
+void Voronoi::handle_site_event(Point* site) {
     // Si l'abre est vide, on ajoute le site a l'arbre (qui sera donc la racine)
     if(!line) {
         line = new BeachLine(site);
@@ -67,7 +59,7 @@ void handle_site_event(Point* site) {
     }
 
     // Recuperer la parabole en dessous du site
-    BeachLine* parable = search(line, site->point.x);
+    BeachLine* parable = search(line, site->x);
 
     // Enlever l'evenement s'il n'a pas lieu d'etre
     if (parable->circle_event) {
@@ -86,7 +78,7 @@ void handle_site_event(Point* site) {
     parable->left->right = b;
 
     // Créer deux nouvelles demi-arêtes dans le DCEL
-    Point* start = new Point(site->point.x, get_y_parable(parable->site, site->point.x));
+    Point* start = new Point(site->x, get_y_parable(parable->site, site->x));
 
     Edge* xl = new Edge(start, parable->site, site);
     Edge* xr = new Edge(start, site, parable->site);
@@ -104,7 +96,7 @@ void handle_site_event(Point* site) {
 
 }
 
-void handle_circle_event(BeachLine* parable) {
+void Voronoi::handle_circle_event(BeachLine* parable) {
     BeachLine* l = parable->get_left(parable);
     BeachLine* r = parable->get_right(parable);
 
@@ -115,7 +107,7 @@ void handle_circle_event(BeachLine* parable) {
         r->circle_event = 0;
     }
 
-    Point* s = new Point(parable->circle_event->point->point.x, get_y_parable(l->site, parable->circle_event->point->point.x));
+    Point* s = new Point(parable->circle_event->point->x, get_y_parable(l->site, parable->circle_event->point->x));
 
     Edge* xl = parable->get_left_parent(parable)->edge;
     Edge* xr = parable->get_right_parent(parable)->edge;
@@ -127,7 +119,7 @@ void handle_circle_event(BeachLine* parable) {
     check_circle_event(r);
 }
 
-void check_circle_event(BeachLine* parable) {
+void Voronoi::check_circle_event(BeachLine* parable) {
     BeachLine* l = parable->get_left(parable);
     BeachLine* r = parable->get_right(parable);
 
@@ -146,11 +138,11 @@ void check_circle_event(BeachLine* parable) {
 
     float length = get_length_site(s, l->site);
 
-    if(s->point.y + length < y_beach) {
+    if(s->y + length < y_beach) {
         return;
     }
 
-    Event* e = new Event(new Point(s->point.x, s->point.y - length), false);
+    Event* e = new Event(new Point(s->x, s->y - length), false);
 
     r->circle_event = e;
     e->parable = parable;
@@ -158,7 +150,7 @@ void check_circle_event(BeachLine* parable) {
     queue.push(e);
 }
 
-BeachLine* search(BeachLine* line, int val) {
+BeachLine* Voronoi::search(BeachLine* line, int val) {
     // Rechercher une valeur dans l'arbre
 
     BeachLine* currentNode = line;
@@ -166,12 +158,12 @@ BeachLine* search(BeachLine* line, int val) {
     // Parcourir jusqu'a une feuille
     while(currentNode != NULL) {
         // Checker si la valeur est inférieure a celle du noeud courant
-        if(val < currentNode->site->point.x) {
+        if(val < currentNode->site->x) {
             // Mettre a jour le noeud courant (cote sous-arbre gauche)
             currentNode = currentNode->left;
 
         // Checker si la valeur est superieure a celle du noeud courant
-        }else if(val > currentNode->site->point.x) {
+        }else if(val > currentNode->site->x) {
             // Mettre a jour le noeud courant (cote sous-arbre droit)
             currentNode = currentNode->right;
         
@@ -184,27 +176,27 @@ BeachLine* search(BeachLine* line, int val) {
     return 0;
 }
 
-float get_length_site(Point* s, Point* site) {
+float Voronoi::get_length_site(Point* s, Point* site) {
     // Retrourne la distance entre s et le site (rayon du cercle)
 
-    return sqrt(pow(site->point.x - s->point.x, 2) + pow(site->point.y - s->point.y, 2));
+    return sqrt(pow(site->x - s->x, 2) + pow(site->y - s->y, 2));
 }
 
-float get_length_beach(float y_data, float y_beach) {
+float Voronoi::get_length_beach(float y_data, float y_beach) {
 	// Retourne la distance entre le site et la plage
 	
     return y_beach - y_data;
 }
 
-float get_y_parable(Point* point, float x) {
+float Voronoi::get_y_parable(Point* point, float x) {
 	// Retourne la valeur de 'y' vis a vis de l'equation de la parabole
     
-    float p = get_length_beach(point->point.y, y_beach);
+    float p = get_length_beach(point->y, y_beach);
 
-	return pow(x - point->point.x, 2) / (2 * p) + point->point.y;
+	return pow(x - point->x, 2) / (2 * p) + point->y;
 }
 
-Point* get_edge_intersection(Edge* xl, Edge* xr) {
+Point* Voronoi::get_edge_intersection(Edge* xl, Edge* xr) {
     // Retrourne le point d'intersection s'il y en a un
     
     if(xl->a != xr->a) {

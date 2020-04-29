@@ -4,10 +4,9 @@
 
 #include <iostream>
 
-#include "point.cpp"
-
 class Edge {
 public:
+    // VARIABLES
     Point* start;       // Point de depart
     Point* finish;      // Point d'arrivee
     Point* direction;   // Direction
@@ -19,18 +18,19 @@ public:
     float a;            // 'a' de l'equation de droite 'ax + b'
     float b;            // 'b' de l'equation de droite 'ax + b'
 
+    // CONSTRUCTEUR
     Edge(Point* start_data, Point* a_data, Point* b_data) {
         start = start_data;
         finish = 0;
-        direction = new Point(b_data->point.y - a_data->point.y, -(b_data->point.x - a_data->point.x));
+        direction = new Point(b_data->y - a_data->y, -(b_data->x - a_data->x));
         left = a_data;
         right = b_data;
 
         twin = 0;
         
         // a = (yb - ya) / (xb - xa)
-        a = (b_data->point.y - a_data->point.y) / (b_data->point.x - a_data->point.x);
+        a = (b_data->y - a_data->y) / (b_data->x - a_data->x);
         // b = y - ax avec (x,y) coordonnees d'un point passant par la droite
-        b = start_data->point.y - a * start_data->point.x;
+        b = start_data->y - a * start_data->x;
     }
 };

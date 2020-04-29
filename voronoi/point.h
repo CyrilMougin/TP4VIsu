@@ -9,11 +9,13 @@ typedef struct {
 
 class Point {
 public :
+    // VARIABLE
+    //Data point;
+    GLfloat x, y;
 
-    Data point;
-
+    // CONSTRUCTEUR
     Point(float data_x, float data_y) {
-        point.x = data_x;
-        point.y = data_y;
+        x = data_x;
+        y = data_y;
     }
 };

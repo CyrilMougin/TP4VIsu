@@ -1,7 +1,11 @@
 add_library(build
 	beach_line.cpp
-	binary_search_tree.cpp
-	utils.cpp		)
+	beach_line.h
+	edge.h
+	event.h
+	point.h		
+	voronoi.cpp
+	voronoi.h		)
 	
 target_include_directories(build
     PUBLIC 
