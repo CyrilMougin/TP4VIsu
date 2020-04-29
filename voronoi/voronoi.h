@@ -16,12 +16,13 @@ public:
     std::priority_queue<Event*> queue;
     std::set<Event*> set_events_deleted;
     BeachLine* line;
+    std::list<Edge*> list_edges;
 
     // CONSTRUCTEUR
     Voronoi();
 
     // METHODES
-    void voronoi_diagram(std::set<Point*> set_sites, int w, int h);
+    std::list<Edge*> voronoi_diagram(std::set<Point*> set_sites, int w, int h);
     void handle_site_event(Point* site);
     void handle_circle_event(BeachLine* parable);
     void check_circle_event(BeachLine* parable);
@@ -30,5 +31,9 @@ public:
     float get_length_beach(float y_data, float y_beach);
     float get_y_parable(Point* point, float x);
     Point* get_edge_intersection(Edge* xl, Edge* xr);
+
+    void FinishEdge(BeachLine* n);
+    double GetXOfEdge(BeachLine* par, double y);
+    BeachLine* GetParabolaByX(double xx);
     
 };
