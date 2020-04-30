@@ -10,79 +10,40 @@
 
 namespace vor {
 
-	typedef std::list<Point*>		Vertices;
-	typedef std::list<Edge*>		Edges;
+	typedef std::list<Point*> Points;
+	typedef std::list<Edge*> Edges;
 
-
-
-	class Voronoi
-	{
+	class Voronoi {
 	public:
+		// VARIABLES
+		double width;		// Largeur du diagramme
+		double height;		// Hauteur du diagramme
 
-		/*
-			Constructor - without any parameters
-		*/
+		Points* list_sites;	// Liste des sites du diagramme
+		Edges* list_edges;	// Liste des aretes du diagramme
+		BeachLine* tree;	// Arbre de recherche binaire
+		
+		double beach;
 
-		Voronoi();
-
-		/*
-			The only public function for generating a diagram
-			input:
-				v		: Vertices - places for drawing a diagram
-				w		: width  of the result (top left corner is (0, 0))
-				h		: height of the result
-			output:
-				pointer to list of edges
-			All the data structures are managed by this class
-		*/
-
-		Edges* GetEdges(Vertices* v, int w, int h);
-
-	private:
-
-		/*
-						places		: container of places with which we work
-						edges		: container of edges which will be teh result
-						width		: width of the diagram
-						height		: height of the diagram
-						root		: the root of the tree, that represents a beachline sequence
-						ly			: current "y" position of the line (see Fortune's algorithm)
-		*/
-
-		Vertices* places;
-		Edges* edges;
-		double			width, height;
-		BeachLine* root;
-		double			ly;
-
-		/*
-						deleted		: set  of deleted (false) Events (since we can not delete from PriorityQueue
-						points		: list of all new points that were created during the algorithm
-						queue		: priority queue with events to process
-		*/
-
-		std::set<Event*>	deleted;
-		std::list<Point*> points;
 		std::priority_queue<Event*, std::vector<Event*>, Event::CompareEvent> queue;
 
-		/*
-						InsertParabola		: processing the place event
-						RemoveParabola		: processing the circle event
-						FinishEdge			: recursively finishes all infinite edges in the tree
-						GetXOfEdge			: returns the current x position of an intersection point of left and right parabolas
-						GetParabolaByX		: returns the Parabola that is under this "x" position in the current beachline
-						CheckCircle			: checks the circle event (disappearing) of this parabola
-						GetEdgeInterse
-		*/
+		// CONSTRUCTEUR
+		Voronoi();
 
-		void		InsertParabola(Point* p);
-		void		RemoveParabola(Event* e);
-		void		FinishEdge(BeachLine* n);
-		double		GetXOfEdge(BeachLine* par, double y);
-		BeachLine* GetParabolaByX(double xx);
-		double		GetY(Point* p, double x);
-		void		CheckCircle(BeachLine* b);
-		Point* GetEdgeIntersection(Edge* a, Edge* b);
+		// METHODES
+		Edges* VoronoiDiagram(Points* v, int w, int h);					// Corps de l'aglorithme de Fortune
+		void HandleSiteEvent(Point* point);								// Implementation du cas d'un site
+		void HandleCircleEvent(BeachLine* parable);						// Implementation du cas d'un cercle
+		
+		void FinishEdge(BeachLine* parable);							// Definis une fin a toutes les aretes
+		BeachLine* GetParable(double value);							// Recupere la parabole au dessus de la valeur
+		void CheckCircle(BeachLine* parable);							// Verifie le cas du cercle pour une parabole donnee 
+		
+		double GetDiscriminantSolution(BeachLine* parable, double y);	// Calcul du discriminant entre deux courbes
+		double GetYParable(Point* point, double x);						// Calcul la valeur de 'y' vis a vis de l'equation de la parabole
+		double GetSiteLength(Point* s, Point* site);					// Calcul la distance entre deux points
+		Point* GetEdgeIntersection(Edge* a, Edge* b);					// Calcul l'intersection entre deux aretes
+		
 	};
 
 }

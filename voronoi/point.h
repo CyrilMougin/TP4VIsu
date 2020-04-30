@@ -5,9 +5,9 @@
 
 class Point {
 public :
-    // VARIABLE
-    double x; 
-    double y;
+    // VARIABLES
+    GLdouble x; 
+    GLdouble y;
 
     // CONSTRUCTEUR
     Point(float data_x, float data_y) {

@@ -9,7 +9,7 @@ public:
 
     bool is_a_leaf;             // Definis si c'est une feuille (true) ou pas (false)
 
-    Event* circle_event;   //
+    Event* circle_event;
     Edge* edge;                 // Bord associe a la parabole
 
     BeachLine* parent;          // Parent (vis a vis de l'arbre de recherche binaire)
@@ -25,12 +25,12 @@ public:
 	BeachLine* Right() { return _right; }
 
     // METHODES
-    static BeachLine* get_left_parent(BeachLine* line);    // Retourne le plus proche parent de gauche
-    static BeachLine* get_right_parent(BeachLine* line);   // Retourne le plus proche parent de droite
-    static BeachLine* get_left_child(BeachLine* line);
-    static BeachLine* get_right_child(BeachLine* line);
-    static BeachLine* get_left(BeachLine* line);           // Retroune la plus proche feuille de gauche
-    static BeachLine* get_right(BeachLine* line);          // Retroune la plus proche feuille de droite
+    static BeachLine* get_left_parent(BeachLine* line);     // Retourne le plus proche parent de gauche
+    static BeachLine* get_right_parent(BeachLine* line);    // Retourne le plus proche parent de droite
+    static BeachLine* get_left_child(BeachLine* line);      // Retroune la plus proche feuille de gauche (en partant d'un parent)
+    static BeachLine* get_right_child(BeachLine* line);     // Retroune la plus proche feuille de droite (en partant d'un parent)
+    static BeachLine* get_left(BeachLine* line);            // Retroune la plus proche feuille de gauche (en partant d'un enfant)
+    static BeachLine* get_right(BeachLine* line);           // Retroune la plus proche feuille de droite (en partant d'un enfant)
 
 private:
 

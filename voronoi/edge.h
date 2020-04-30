@@ -1,7 +1,3 @@
-// Inspire de : 
-// Fortune’s algorithm and implementation : http://blog.ivank.net/fortunes-algorithm-and-implementation.html
-// Equation de droite : http://labomath.free.fr/qcms/seconde/equadroite/droites.pdf
-
 #include <iostream>
 
 class Edge {
@@ -13,10 +9,10 @@ public:
     Point* left;        // Point suivant (par convention du sens antihoraire)
     Point* right;       // Point précédent (par convention du sens antihoraire)
 
-    Edge* neighbour;         // Arete jumelle
+    Edge* neighbour;    // Arete jumelle
 
-    double a;            // 'a' de l'equation de droite 'ax + b'
-    double b;            // 'b' de l'equation de droite 'ax + b'
+    double a;           // 'a' de l'equation de droite 'ax + b'
+    double b;           // 'b' de l'equation de droite 'ax + b'
 
     // CONSTRUCTEUR
     Edge(Point* start_data, Point* a_data, Point* b_data) {

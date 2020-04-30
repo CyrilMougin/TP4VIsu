@@ -4,10 +4,10 @@
 
 #include "voronoi/voronoi.h"
 
-vor::Voronoi * v;
-vor::Vertices * ver;
-vor::Vertices * dir;
-vor::Edges * edg;
+vor::Voronoi * voronoi;
+vor::Points * list_points;
+vor::Points * list_directions;
+vor::Edges * list_edges;
 
 double width = 5;
 double height = 5;
@@ -17,20 +17,17 @@ int main() {
 
     using namespace vor;
 
-    v = new Voronoi();
-	ver = new Vertices();
-	dir = new Vertices();
+    voronoi = new Voronoi();
+	list_points = new Points();
+	list_directions = new Points();
 
+    // Mis en place des points et des directions 
     for (int i = 0; i < 3; i++) {
-        //Point* new_data = new Point(4 * i, 4 * i);
-
-        //ver->push_back(new_data);
-
-        ver->push_back(new Point( width * (double)rand()/(double)RAND_MAX , height * (double)rand()/(double)RAND_MAX )); 
-		dir->push_back(new Point( (double)rand()/(double)RAND_MAX - 0.5, (double)rand()/(double)RAND_MAX - 0.5));
+        list_points->push_back(new Point( width * (double)rand()/(double)RAND_MAX , height * (double)rand()/(double)RAND_MAX )); 
+		list_directions->push_back(new Point( (double)rand()/(double)RAND_MAX - 0.5, (double)rand()/(double)RAND_MAX - 0.5));
     }
 
-    for (auto point = ver->begin(); point != ver->end(); point++) {
+    for (auto point = list_points->begin(); point != list_points->end(); point++) {
         Point* new_data = *point;
 
         std::cout << "x : " << new_data->x  << " | y : " << new_data->y << std::endl;
@@ -38,22 +35,25 @@ int main() {
     }
     
     std::cout << "Voronoi start" << std::endl;
-    edg = v->GetEdges(ver, width, height);
+    list_edges = voronoi->VoronoiDiagram(list_points, width, height);
     std::cout << "Voronoi done" << std::endl;
 
-    for(auto edge = edg->begin(); edge != edg->end(); edge++) {
+    for(auto edge = list_edges->begin(); edge != list_edges->end(); edge++) {
 		Edge* new_edge = *edge;
 
         if( new_edge->start == 0) {
 			std::cout << "Début du bord manquant" << std::endl;
+
+            continue;
 		}
 		
         if(new_edge->finish == 0) {
 			std::cout << "Extremite du bord manquant" << std::endl;
+
+            continue;
 		}
 
-        std::cout << "Debut : " << new_edge->start->x << "," << new_edge->start->y << std::endl;
-        std::cout << "Fin : " << new_edge->finish->x << "," << new_edge->finish->y << std::endl;
+        std::cout << "Debut : " << new_edge->start->x << "," << new_edge->start->y << " | Fin : " << new_edge->finish->x << "," << new_edge->finish->y << std::endl;
 	}
 
     std::cout << "Execution done" << std::endl;

@@ -8,164 +8,202 @@
 using namespace vor;
 
 Voronoi::Voronoi() {
-	edges = 0;
+	list_edges = 0;
 }
 
-Edges* Voronoi::GetEdges(Vertices* v, int w, int h)
-{
-	places = v;
+Edges* Voronoi::VoronoiDiagram(Points* v, int w, int h) {
+	// Corps de l'algorithme de Fortune
+
+	list_sites = v;
 	width = w;
 	height = h;
-	root = 0;
+	tree = 0;
 
-	if (!edges) edges = new Edges();
-	else
-	{
-		for (Vertices::iterator i = points.begin(); i != points.end(); ++i) delete (*i);
-		for (Edges::iterator i = edges->begin(); i != edges->end(); ++i) delete (*i);
-		points.clear();
-		edges->clear();
+	// Initialiser la queue Q en fonction des valeurs y (ordre decroissant) 
+	for (auto i = list_sites->begin(); i != list_sites->end(); ++i) {
+		Point* new_point = *i;
+
+		queue.push(new Event(new_point, true));
 	}
 
-	for (Vertices::iterator i = places->begin(); i != places->end(); ++i)
-	{
-		queue.push(new Event(*i, true));
-	}
+	// Initialiser la liste de bords D
+	list_edges = new Edges();
 
-	Event* e;
-	while (!queue.empty())
-	{
-		e = queue.top();
+	// Recuperer le premier element de la queue et l'enlever de cette derniere
+	Event* event;
+	
+	while (!queue.empty()) {
+		// Recuperer le premier element de la queue et l'enlever de cette derniere
+		event = queue.top();
 		queue.pop();
-		ly = e->point->y;
-		if (deleted.find(e) != deleted.end()) { delete(e); deleted.erase(e); continue; }
-		if (e->is_a_site_event) InsertParabola(e->point);
-		else RemoveParabola(e);
-		delete(e);
+
+		beach = event->point->y;
+
+		// Verifier si l'element est un site
+		if (event->is_a_site_event) {
+            std::cout << "L'element est un site" << std::endl;
+
+			HandleSiteEvent(event->point);
+
+		}else {
+			std::cout << "L'element n'est pas un site" << std::endl;
+
+			HandleCircleEvent(event->parable);
+		}
+
+		delete(event);
 	}
 
-	FinishEdge(root);
+	FinishEdge(tree);
 
-	for (Edges::iterator i = edges->begin(); i != edges->end(); ++i)
-	{
-		if ((*i)->neighbour)
-		{
-			(*i)->start = (*i)->neighbour->finish;
-			delete (*i)->neighbour;
+	// "Pour chaque couple de demi-aretes, le debut de l'une est la fin de l'autre"
+	// Fixer la fin d'une arete au debut de sa soeur et la supprimer
+	for (auto i = list_edges->begin(); i != list_edges->end(); ++i) {
+		Edge* new_edge = *i;
+
+		if (new_edge->neighbour) {
+			new_edge->start = new_edge->neighbour->finish;
+			
+			delete new_edge->neighbour;
 		}
 	}
 
-	return edges;
+	return list_edges;
 }
 
-void	Voronoi::InsertParabola(Point* p)
-{
-	if (!root) { root = new BeachLine(p); return; }
+void Voronoi::HandleSiteEvent(Point* point) {
+	// Si l'abre est vide, on ajoute le site a l'arbre (qui sera donc la racine)
+	if (!tree) { 
+		tree = new BeachLine(point); 
+		
+		return; 
+	}
 
-	if (root->is_a_leaf && root->site->y - p->y < 1) // degenerovaný pøípad - obì spodní místa ve stejné výšce
-	{
-		Point* fp = root->site;
-		root->is_a_leaf = false;
-		root->SetLeft(new BeachLine(fp));
-		root->SetRight(new BeachLine(p));
-		Point* s = new Point((p->x + fp->x) / 2, height); // zaèátek hrany uprostøed míst
-		points.push_back(s);
-		if (p->x > fp->x) root->edge = new Edge(s, fp, p); // rozhodnu, který vlevo, který vpravo
-		else root->edge = new Edge(s, p, fp);
-		edges->push_back(root->edge);
+	// --- PAS TOUT COMPRIS ----------------------------------
+	if (tree->is_a_leaf && tree->site->y - point->y < 1) {
+		Point* fp = tree->site;
+		tree->is_a_leaf = false;
+
+		tree->SetLeft(new BeachLine(fp));
+		tree->SetRight(new BeachLine(point));
+
+		Point* s = new Point((point->x + fp->x) / 2, height);
+
+		if (point->x > fp->x) {
+			tree->edge = new Edge(s, fp, point);
+		
+		}else {
+			tree->edge = new Edge(s, point, fp);
+		}
+
+		list_edges->push_back(tree->edge);
+		
 		return;
 	}
+	// -------------------------------------------------------
 
-	BeachLine* par = GetParabolaByX(p->x);
+	// Recuperer la parabole en dessous du site
+	BeachLine* parable = GetParable(point->x);
 
-	if (par->circle_event)
-	{
-		deleted.insert(par->circle_event);
-		par->circle_event = 0;
+	// Enlever l'evenement s'il n'a pas lieu d'etre
+	if (parable->circle_event) {
+		parable->circle_event = 0;
 	}
 
-	Point* start = new Point(p->x, GetY(par->site, p->x));
-	points.push_back(start);
+	// Remplacer la feuille de l'arbre par par un sous-arbre avec trois feuilles 
+	BeachLine* a = new BeachLine(parable->site);
+	BeachLine* b = new BeachLine(point);
+	BeachLine* c = new BeachLine(parable->site);
 
-	Edge* el = new Edge(start, par->site, p);
-	Edge* er = new Edge(start, p, par->site);
+	parable->SetLeft(new BeachLine());
+	parable->SetRight(c);
 
-	el->neighbour = er;
-	edges->push_back(el);
+	parable->Left()->SetLeft(a);
+	parable->Left()->SetRight(b);
 
-	// pøestavuju strom .. vkládám novou parabolu
-	par->edge = er;
-	par->is_a_leaf = false;
+	// Créer deux nouvelles demi-arêtes dans le DCEL
+	Point* start = new Point(point->x, GetYParable(parable->site, point->x));
 
-	BeachLine* p0 = new BeachLine(par->site);
-	BeachLine* p1 = new BeachLine(p);
-	BeachLine* p2 = new BeachLine(par->site);
+	Edge* xl = new Edge(start, parable->site, point);
+	Edge* xr = new Edge(start, point, parable->site);
 
-	par->SetRight(p2);
-	par->SetLeft(new BeachLine());
-	par->Left()->edge = el;
+	xl->neighbour = xr;
+	list_edges->push_back(xl);
 
-	par->Left()->SetLeft(p0);
-	par->Left()->SetRight(p1);
+	parable->edge = xr;
+	parable->is_a_leaf = false;
+	parable->Left()->edge = xl;
 
-	CheckCircle(p0);
-	CheckCircle(p2);
+	// Verifier que les nouveau triplets d'arcs consecutifs avec l'arc associe situes en dessous (a) ou au dessus (c)
+    // correspondent a deux aretes convergentes
+	CheckCircle(a);
+	CheckCircle(c);
 }
 
-void	Voronoi::RemoveParabola(Event* e)
-{
-	BeachLine* p1 = e->parable;
+void Voronoi::HandleCircleEvent(BeachLine* parable) {
+    BeachLine* l = BeachLine::get_left(parable);
+    BeachLine* r = BeachLine::get_right(parable);
 
-	BeachLine* xl = BeachLine::get_left_parent(p1);
-	BeachLine* xr = BeachLine::get_right_parent(p1);
+	if (l->circle_event) {
+		l->circle_event = 0;
+	}
+	if (r->circle_event) {
+		r->circle_event = 0;
+	}
 
-	BeachLine* p0 = BeachLine::get_left_child(xl);
-	BeachLine* p2 = BeachLine::get_right_child(xr);
+	Point* s = new Point(parable->circle_event->point->x, GetYParable(parable->site, parable->circle_event->point->x));
 
-	if (p0 == p2) std::cout << "chyba - pravá a levá parabola má stejné ohnisko!\n";
+	Edge* xl = BeachLine::get_left_parent(parable)->edge;
+	Edge* xr = BeachLine::get_right_parent(parable)->edge;
 
-	if (p0->circle_event) { deleted.insert(p0->circle_event); p0->circle_event = 0; }
-	if (p2->circle_event) { deleted.insert(p2->circle_event); p2->circle_event = 0; }
+	xl->finish = s;
+	xr->finish = s;
 
-	Point* p = new Point(e->point->x, GetY(p1->site, e->point->x));
-	points.push_back(p);
-
-	xl->edge->finish = p;
-	xr->edge->finish = p;
+	// --- PAS TOUT COMPRIS ----------------------------------
+    BeachLine* pl = BeachLine::get_left_parent(parable);
+    BeachLine* pr = BeachLine::get_right_parent(parable);
 
 	BeachLine* higher;
-	BeachLine* par = p1;
-	while (par != root)
-	{
+	BeachLine* par = parable;
+	
+	while (par != tree) {
 		par = par->parent;
-		if (par == xl) higher = xl;
-		if (par == xr) higher = xr;
-	}
-	higher->edge = new Edge(p, p0->site, p2->site);
-	edges->push_back(higher->edge);
-
-	BeachLine* gparent = p1->parent->parent;
-	if (p1->parent->Left() == p1)
-	{
-		if (gparent->Left() == p1->parent) gparent->SetLeft(p1->parent->Right());
-		if (gparent->Right() == p1->parent) gparent->SetRight(p1->parent->Right());
-	}
-	else
-	{
-		if (gparent->Left() == p1->parent) gparent->SetLeft(p1->parent->Left());
-		if (gparent->Right() == p1->parent) gparent->SetRight(p1->parent->Left());
+		if (par == pl) higher = pl;
+		if (par == pr) higher = pr;
 	}
 
-	delete p1->parent;
-	delete p1;
+	higher->edge = new Edge(s, l->site, r->site);
+	list_edges->push_back(higher->edge);
 
-	CheckCircle(p0);
-	CheckCircle(p2);
+	BeachLine* gparent = parable->parent->parent;
+	if (parable->parent->Left() == parable) {
+		if (gparent->Left() == parable->parent) {
+			gparent->SetLeft(parable->parent->Right());
+		}
+		if (gparent->Right() == parable->parent) {
+			gparent->SetRight(parable->parent->Right());
+		}
+	}else {
+		if (gparent->Left() == parable->parent) {
+			gparent->SetLeft(parable->parent->Left());
+		}
+		if (gparent->Right() == parable->parent) {
+			gparent->SetRight(parable->parent->Left());
+		}
+	}
+
+	delete parable->parent;
+	delete parable;
+	// -------------------------------------------------------
+
+	CheckCircle(l);
+	CheckCircle(r);
 }
 
 void Voronoi::FinishEdge(BeachLine* line) {
 	if (line->is_a_leaf) {
 		delete line;
+		
 		return;
 	}
 
@@ -173,6 +211,7 @@ void Voronoi::FinishEdge(BeachLine* line) {
 	
 	if(line->edge->direction->x > 0.0) {
 		mx = std::max(width, line->edge->start->x + 10);
+	
 	}else {
 		mx = std::min(0., line->edge->start->x - 10);
 	}
@@ -180,7 +219,6 @@ void Voronoi::FinishEdge(BeachLine* line) {
 	Point* finish = new Point(mx, mx * line->edge->a + line->edge->b);
 	
 	line->edge->finish = finish;
-	points.push_back(finish);
 
 	FinishEdge(line->Left());
 	FinishEdge(line->Right());
@@ -188,91 +226,115 @@ void Voronoi::FinishEdge(BeachLine* line) {
 	delete line;
 }
 
-double	Voronoi::GetXOfEdge(BeachLine* par, double y)
-{
-	BeachLine* left = BeachLine::get_left_child(par);
-	BeachLine* right = BeachLine::get_right_child(par);
+double	Voronoi::GetDiscriminantSolution(BeachLine* par, double y) {
+	BeachLine* l = BeachLine::get_left_child(par);
+	BeachLine* r = BeachLine::get_right_child(par);
 
-	Point* p = left->site;
-	Point* r = right->site;
+	Point* pl = l->site;
+	Point* pr = r->site;
 
-	double dp = 2.0 * (p->y - y);
-	double a1 = 1.0 / dp;
-	double b1 = -2.0 * p->x / dp;
-	double c1 = y + dp / 4 + p->x * p->x / dp;
+	// Calcul des coeff pour la parabole de gauche
+	double length_l = pl->y - y;
 
-	dp = 2.0 * (r->y - y);
-	double a2 = 1.0 / dp;
-	double b2 = -2.0 * r->x / dp;
-	double c2 = ly + dp / 4 + r->x * r->x / dp;
+	double a_l = 1 / (2 * length_l);
+	double b_l = -pl->x / length_l;
+	double c_l = y + 2 * length_l / 4 + pl->x * pl->x / (2 * length_l);
 
-	double a = a1 - a2;
-	double b = b1 - b2;
-	double c = c1 - c2;
+	// Calcul des coeff pour la parabole de droite
+	double length_r = pr->y - y;
 
-	double disc = b * b - 4 * a * c;
-	double x1 = (-b + std::sqrt(disc)) / (2 * a);
-	double x2 = (-b - std::sqrt(disc)) / (2 * a);
+	double a_r = 1 / (2 * length_r);
+	double b_r = -pr->x / length_r;
+	double c_r = y + 2 * length_r / 4 + pr->x * pr->x / (2 * length_r);
 
-	double ry;
-	if (p->y < r->y) ry = std::max(x1, x2);
-	else ry = std::min(x1, x2);
+	// Difference entre les deux coeff de paraboles
+	double a = a_l - a_r;
+	double b = b_l - b_r;
+	double c = c_l - c_r;
 
-	return ry;
-}
+	// Discriminant
+	double disc = pow(b, 2) - 4 * a * c;
+	
+	// Racines reelles du discriminant
+	double x1 = (-b + sqrt(disc)) / (2 * a);
+	double x2 = (-b - sqrt(disc)) / (2 * a);
 
-BeachLine* Voronoi::GetParabolaByX(double xx)
-{
-	BeachLine* par = root;
-	double x = 0.0;
-
-	while (!par->is_a_leaf) // projdu stromem dokud nenarazím na vhodný list
-	{
-		x = GetXOfEdge(par, ly);
-		if (x > xx) par = par->Left();
-		else par = par->Right();
+	if (pl->y < pr->y) {
+		return std::max(x1, x2);
+	
+	}else {
+		return std::min(x1, x2);
 	}
-	return par;
+
+	return 0;
 }
 
-double	Voronoi::GetY(Point* p, double x) {
-	// Retourne la valeur de 'y' vis a vis de l'equation de la parabole
+BeachLine* Voronoi::GetParable(double value) {
+	BeachLine* parable = tree;
 
-	double length = p->y - ly;
+	// Parcourir jusqu'a une feuille
+	while (!parable->is_a_leaf) {
+		double x = GetDiscriminantSolution(parable, beach);
+		
+		if (value < x) {
+			// Recuperer le sous-arbre de gauche (vis a vis de l'arbre de recherche binaire)
+			parable = parable->Left();
 
+		}else {
+			// Recuperer le sous-arbre de droite (vis a vis du l'arbre de recherche binaire)
+			parable = parable->Right();
+		}
+	}
+
+	return parable;
+}
+
+double	Voronoi::GetYParable(Point* p, double x) {
+	double length = p->y - beach;
+
+	// Calcul des coeff
 	double a = 1 / (2 * length);
 	double b = -p->x / length;
-	double c = ly + 2 * length / 4 + p->x * p->x / (2 * length);
+	double c = beach + 2 * length / 4 + p->x * p->x / (2 * length);
 
 	// De la forme ax² + bx + c
 	return a * pow(x, 2) + b * x + c; 
 }
 
-void	Voronoi::CheckCircle(BeachLine* b)
-{
-	BeachLine* lp = BeachLine::get_left_parent(b);
-	BeachLine* rp = BeachLine::get_right_parent(b);
+double Voronoi::GetSiteLength(Point* s, Point* site) {
+    // Retrourne la distance entre s et le site (rayon du cercle)
 
-	BeachLine* a = BeachLine::get_left_child(lp);
-	BeachLine* c = BeachLine::get_right_child(rp);
+    return sqrt(pow(site->x - s->x, 2) + pow(site->y - s->y, 2));
+}
 
-	if (!a || !c || a->site == c->site) return;
+void Voronoi::CheckCircle(BeachLine* parable) {
+	BeachLine* l = BeachLine::get_left(parable);
+	BeachLine* r = BeachLine::get_right(parable);
+	
+	if(!l || !r || l->site == r->site) {
+        return;
+    }
 
-	Point* s = 0;
-	s = GetEdgeIntersection(lp->edge, rp->edge);
-	if (s == 0) return;
+	Edge* xl = BeachLine::get_left_parent(parable)->edge;
+	Edge* xr = BeachLine::get_right_parent(parable)->edge;
 
-	double dx = a->site->x - s->x;
-	double dy = a->site->y - s->y;
+	Point* s = GetEdgeIntersection(xl, xr);
 
-	double d = std::sqrt((dx * dx) + (dy * dy));
+	if (s == 0) {
+		return;
+	}
 
-	if (s->y - d >= ly) { return; }
+	double length = GetSiteLength(s, l->site);
 
-	Event* e = new Event(new Point(s->x, s->y - d), false);
-	points.push_back(e->point);
-	b->circle_event = e;
-	e->parable = b;
+	if (s->y - length >= beach) {
+		return;
+	}
+
+	Event* e = new Event(new Point(s->x, s->y - length), false);
+
+	parable->circle_event = e;
+	e->parable = parable;
+	
 	queue.push(e);
 }
 
@@ -295,7 +357,6 @@ Point* Voronoi::GetEdgeIntersection(Edge* a, Edge* b) {
 	}
 
 	Point* p = new Point(x, y);
-	points.push_back(p);
 	
 	return p;
 }
