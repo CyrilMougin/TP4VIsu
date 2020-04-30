@@ -1,28 +1,16 @@
-# Sources & Détails du TP
+# Sources du TP
 
-## "binary_search_tree.cpp"
-Inspiré de : 
+L'implémentation du TP c'est inspiré des sources suivantes :
+
+IMN430 - Chapitre 4 :
+- [Visualisation basée sur le domaine](http://info.usherbrooke.ca/ogodin/enseignement/imn430/chapitres/imn430-chap04.pdf)
+
+Algorithme de Fortune & Diagramme de Voronoï :
 - [Binary Search Tree Implementation in C++](https://medium.com/@13dipty/binary-search-tree-implementation-in-c-537b9a9cedf8)
-
-Construction de l'arbre binaire de recherche avec toutes les fonctions qui lui sont affiliés :
-- Recherche d'un élément.
-- Ajout d'un élément.
-- Suppression d'un élément.
-
-## "beach_line.cpp"
-Inspiré de :
-- [Fortune’s algorithm and implementation](http://blog.ivank.net/fortunes-algorithm-and-implementation.html)
-
-Parcours de l'arbre binaire de recherche pour trouver toutes les feuilles à partir de l'une d'entre elle.
-
-## "voronoi.cpp"
-Inspiré de :
-- [Fortune’s algorithm and implementation](http://blog.ivank.net/fortunes-algorithm-and-implementation.html)
-- [Geometrie Algorithmique](http://www.cgeo.ulg.ac.be/CG/CG_07.pdf)
 - [Diagramme de Voronoi](https://perso.telecom-paristech.fr/dufourd/pact_archives/projet-2011-52/le-projet/avancement/solution-simplifiee/diagramme-de-voronoi/)
+- [Fortune’s algorithm and implementation](http://blog.ivank.net/fortunes-algorithm-and-implementation.html)
+- [Equation de droite](http://labomath.free.fr/qcms/seconde/equadroite/droites.pdf)
+- [Geometrie Algorithmique](http://www.cgeo.ulg.ac.be/CG/CG_07.pdf)
 - [Intersection entre deux droites](https://calculis.net/intersection)
+- [Calcul du discriminant](https://fr.khanacademy.org/math/algebra/quadratics/solving-quadratics-using-the-quadratic-formula/a/discriminant-review)
 
-Implémentation de l'algorithme de Fortune avec les fonctions principales affiliées :
-- Parcours de chaque site présents.
-- Ajouter une parabole et affilier les arêtes.
-- Vérifier que des nouveaux triplets d'arcs consécutifs avec un arc (situés en dessous ou au dessus) correspondent à deux arêtes convergentes. 
