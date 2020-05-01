@@ -6,8 +6,9 @@ project(EX4
 
 set(CXX_STANDARD 17)
 
-add_subdirectory(voronoi)
 add_subdirectory(glad)
+add_subdirectory(voronoi)
+add_subdirectory(delaunay)
 
 add_executable(TP4_exe main.cpp)
 

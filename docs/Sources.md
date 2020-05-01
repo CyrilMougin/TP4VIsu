@@ -14,3 +14,8 @@ Algorithme de Fortune & Diagramme de Voronoï :
 - [Intersection entre deux droites](https://calculis.net/intersection)
 - [Calcul du discriminant](https://fr.khanacademy.org/math/algebra/quadratics/solving-quadratics-using-the-quadratic-formula/a/discriminant-review)
 
+Triangulation de Delaunay - méthode incrémentale :
+- [Bowyer Watson Algorithm](https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm)
+- [Intersection de deux segments](https://forums.commentcamarche.net/forum/affich-3376777-algo-detecter-deux-segments-qui-se-croisent)
+- [Determinant entre deux vecteurs](https://www.supinfo.com/articles/single/2051-determinant-vecteurs)
+
