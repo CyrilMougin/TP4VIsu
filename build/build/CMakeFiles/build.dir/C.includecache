@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/julien/Documents/USherbrooke/Hiver/IMN731/TP4/TP4VIsu/build/glad/glad.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+glad.h
+/home/julien/Documents/USherbrooke/Hiver/IMN731/TP4/TP4VIsu/build/glad/glad.h
+windows.h
+-
+winapifamily.h
+-
+dlfcn.h
+-
+
+/home/julien/Documents/USherbrooke/Hiver/IMN731/TP4/TP4VIsu/build/glad/glad.h
+KHR/khrplatform.h
+-
+

@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/TP4_exe.dir/main.cpp.o  -o TP4_exe  voronoi/libvoronoi.a glad/libglad.a 

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libbuild.a  CMakeFiles/build.dir/beach_line.cpp.o CMakeFiles/build.dir/voronoi.cpp.o
+/usr/bin/ranlib libbuild.a

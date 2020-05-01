@@ -1,0 +1,2 @@
+/usr/bin/ar qc libvoronoi.a  CMakeFiles/voronoi.dir/beach_line.cpp.o CMakeFiles/voronoi.dir/voronoi.cpp.o
+/usr/bin/ranlib libvoronoi.a

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libdelaunay.a  CMakeFiles/delaunay.dir/test.cpp.o
+/usr/bin/ranlib libdelaunay.a
