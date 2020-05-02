@@ -87,20 +87,20 @@ std::list<Triangle*> Delaunay::SearchTriangle(Point* point) {
         
         // Verifier si les aretes du triangle coupe une autre arete deja existente
         for(auto i = list_edges->begin(); i != list_edges->end(); i++) {
-            std::cout << "New edge" << std::endl;
+            /*std::cout << "New edge" << std::endl;
             std::cout << "(*i) : " << (*i)->start->x << ", " << (*i)->start->y << " | " <<
                                       (*i)->finish->x << ", " << (*i)->finish->y << std::endl;
             std::cout << "edge_ab : " << edge_ab->start->x << ", " << edge_ab->start->y << " | " <<
                                          edge_ab->finish->x << ", " << edge_ab->finish->y << std::endl;
             std::cout << "edge_ca : " << edge_ca->start->x << ", " << edge_ca->start->y << " | " <<
-                                         edge_ca->finish->x << ", " << edge_ca->finish->y << std::endl;
+                                         edge_ca->finish->x << ", " << edge_ca->finish->y << std::endl;*/
                                         
             if(GetSegmentsIntersection(edge_ab, *i) || GetSegmentsIntersection(edge_ca, *i)) {
                 is_intersection = true;
             }
         }
 
-        std::cout << "########## is_intersection  : " << is_intersection << " ##########" << std::endl;
+        //std::cout << "########## is_intersection  : " << is_intersection << " ##########" << std::endl;
 
         // On ajoute le triangle si la condition precedente est verifiee
         if(!is_intersection) {
@@ -128,27 +128,41 @@ std::list<Triangle*> Delaunay::SearchLegalEdge(std::list<Triangle*> triangles) {
         // Chercher l'ancienne arete dans la liste d'aretes
         Point* common_point;
 
-        auto it_AB = std::find(list_edges->begin(), list_edges->end(), AB);
-        auto it_BC = std::find(list_edges->begin(), list_edges->end(), BC);
-        auto it_CA = std::find(list_edges->begin(), list_edges->end(), CA);
+        bool is_equal_AB, is_equal_BC, is_equal_CA = false;
+        for(auto e = list_edges->begin(); e != list_edges->end(); e++) {
+            if(Triangle::EdgesAreEqual(AB, *e)) {
+                is_equal_AB = true;
+                break;
+            }
+            if(Triangle::EdgesAreEqual(BC, *e)) {
+                is_equal_BC = true;
+                break;
+            }
+            if(Triangle::EdgesAreEqual(CA, *e)) {
+                is_equal_CA = true;
+                break;
+            }
+        }
 
         // Constituer le quadrilatere a verifier
-        if(it_AB != list_edges->end()) {
-            common_point = GetPointFromTriangle(*it_AB);
+        if(is_equal_AB) {
+            common_point = GetPointFromTriangle(AB);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->A, new_triangle->C, new_triangle->B, common_point);
             }
 
-        }else if(it_BC != list_edges->end()) {
-            common_point = GetPointFromTriangle(*it_BC);
+        }
+        if(is_equal_BC) {
+            common_point = GetPointFromTriangle(BC);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->B, new_triangle->A, new_triangle->C, common_point);
             }
 
-        }else if(it_CA != list_edges->end()) {
-            common_point = GetPointFromTriangle(*it_CA);
+        }
+        if(is_equal_CA) {
+            common_point = GetPointFromTriangle(CA);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->C, new_triangle->B, new_triangle->A, common_point);
@@ -238,7 +252,7 @@ bool Delaunay::GetSegmentsIntersection(Edge* a, Edge* b) {
         // Verifier si le point d'intersection n'est pas un sommet
         Point* check_point = GetEdgeIntersection(a, b);
 
-        std::cout << "check_point coord : " << check_point->x << ", " << check_point->y << std::endl;
+        //std::cout << "check_point coord : " << check_point->x << ", " << check_point->y << std::endl;
 
         bool are_equal;
         for(auto p = list_points->begin(); p != list_points->end(); p++) { 
