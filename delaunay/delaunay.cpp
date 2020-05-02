@@ -5,6 +5,7 @@
 #include <queue>
 #include <algorithm>
 #include <math.h>
+#include <limits>
 
 #include "delaunay.h"
 
@@ -38,7 +39,7 @@ Edges* Delaunay::DelaunayTriangulation(Points* list_sites) {
     list_edges->push_back(initial_triangle->CA);
 
     // Initialiser la liste de points P
-    list_points = new Points();
+    list_points = list_sites;
 
     list_points->push_back(initial_triangle->A);
     list_points->push_back(initial_triangle->B);
@@ -84,16 +85,26 @@ std::list<Triangle*> Delaunay::SearchTriangle(Point* point) {
 
         bool is_intersection = false;
         
-        // Verifier si les aretes du trainge coupe une autre arete deja existente
+        // Verifier si les aretes du triangle coupe une autre arete deja existente
         for(auto i = list_edges->begin(); i != list_edges->end(); i++) {
+            std::cout << "New edge" << std::endl;
+            std::cout << "(*i) : " << (*i)->start->x << ", " << (*i)->start->y << " | " <<
+                                      (*i)->finish->x << ", " << (*i)->finish->y << std::endl;
+            std::cout << "edge_ab : " << edge_ab->start->x << ", " << edge_ab->start->y << " | " <<
+                                         edge_ab->finish->x << ", " << edge_ab->finish->y << std::endl;
+            std::cout << "edge_ca : " << edge_ca->start->x << ", " << edge_ca->start->y << " | " <<
+                                         edge_ca->finish->x << ", " << edge_ca->finish->y << std::endl;
+                                        
             if(GetSegmentsIntersection(edge_ab, *i) || GetSegmentsIntersection(edge_ca, *i)) {
                 is_intersection = true;
             }
         }
 
+        std::cout << "########## is_intersection  : " << is_intersection << " ##########" << std::endl;
+
         // On ajoute le triangle si la condition precedente est verifiee
         if(!is_intersection) {
-            new_triangles.push_back(new Triangle(point_a, point_b, point_c, false));
+            new_triangles.push_back(new Triangle(point_a, point_b, point_c, true));
         }
 
     }
@@ -214,35 +225,63 @@ bool Delaunay::GetSegmentsIntersection(Edge* a, Edge* b) {
     Edge* CB = new Edge(CD->start, AB->finish);
     Edge* CA = new Edge(CD->start, AB->start);
 
-    // Produit scalaire pour le cas : AB & CD paralleles
-    
+    // Produit vectoriel (determinant en 2D) pour le cas : AB & CD paralleles
     double check_1 = GetDeterminant(AB->direction, CD->direction);
-    std::cout << check_1 << std::endl;
     
-    // Produit scalaire pour le cas : Intersection sur CD
+    // Produit vectoriel (determinant en 2D) pour le cas : Intersection sur CD
     double check_2 = GetDeterminant(AB->direction, AD->direction) * GetDeterminant(AB->direction, AC->direction); 
 
-    // Produit scalaire pour le cas : Intersection sur AB
+    // Produit vectoriel (determinant en 2D) pour le cas : Intersection sur AB
     double check_3 = GetDeterminant(CD->direction, CB->direction) * GetDeterminant(CD->direction, CA->direction);
 
     if(check_1 != 0 && check_2 <= 0 && check_3 <= 0) {
-        std::cout << "Intersection entre les deux aretes" << std::endl;
+        // Verifier si le point d'intersection n'est pas un sommet
+        Point* check_point = GetEdgeIntersection(a, b);
 
-        return true;
+        std::cout << "check_point coord : " << check_point->x << ", " << check_point->y << std::endl;
+
+        bool are_equal;
+        for(auto p = list_points->begin(); p != list_points->end(); p++) { 
+            are_equal = Point::PointAreEqual(check_point, *p);
+
+            if(are_equal) {
+                break;
+            }
+        }
+
+        if(are_equal) {
+            std::cout << "Pas d'intersection entre les deux aretes" << std::endl;
+
+            return false;
+        
+        }else {
+            std::cout << "Intersection entre les deux aretes" << std::endl;
+
+            return true;
+        }
     
     }else {
         std::cout << "Pas d'intersection entre les deux aretes" << std::endl;
 
         return false;
-    }
-    
+    }   
+}
+
+Point* Delaunay::GetEdgeIntersection(Edge* a, Edge* b) {
+	// Calculer les coordonnes du point d'intersection
+	double x = (b->b - a->b) / (a->a - b->a);
+	double y = a->a * x + a->b;
+
+	Point* p = new Point(x, y);
+	
+	return p;
 }
 
 Triangle* Delaunay::SetFirstTriangle(Points* list_points) {
-    double y_min = 0;
-    double y_max = 0;
-    double x_min = 0;
-    double x_max = 0;
+    double y_min = std::numeric_limits<int>::max();
+    double y_max = std::numeric_limits<int>::min();
+    double x_min = std::numeric_limits<int>::max();
+    double x_max = std::numeric_limits<int>::min();
 
     for(auto point = list_points->begin(); point != list_points->end(); point++) {
         // Recuperer les valeurs maximales et minimales de 'x' et 'y'
@@ -256,11 +295,16 @@ Triangle* Delaunay::SetFirstTriangle(Points* list_points) {
         if(y > y_max) y_max = y;
     }
 
-    Point* point_a = new Point(x_min, y_min);
-    Point* point_b = new Point(x_min, 2 * y_max);
-    Point* point_c = new Point(2 * x_max, y_min);
+    Point* point_a = new Point(x_min - 4, y_min - 2);
+    Point* point_b = new Point(x_min - 2, 2 * (y_max + 2));
+    Point* point_c = new Point(2 * (x_max + 2), y_min - 2);
 
     Triangle* new_triangle = new Triangle(point_a, point_b, point_c, true);
+
+    std::cout << "Coord super triangle : " << point_a->x << ", " << point_a->y << " | " <<
+                                              point_b->x << ", " << point_b->y << " | " <<
+                                              point_c->x << ", " << point_c->y << std::endl;
+
 
     return new_triangle;
 }

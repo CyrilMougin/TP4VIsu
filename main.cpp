@@ -1,6 +1,13 @@
+#include <iostream>
+
 #include "delaunay/delaunay.h"
 
 del::Delaunay* delaunay;
+del::Points * list_points;
+del::Edges * list_edges;
+
+double width = 5;
+double height = 5;
 
 int main() {
     std::cout << "Execution start" << std::endl;
@@ -8,24 +15,25 @@ int main() {
     using namespace del;
 
     delaunay = new Delaunay();
+    list_points = new Points();
 
-    Point* A = new Point(1,1);
-    Point* B = new Point(4,4);
+    // Mis en place des points et des directions 
+    for (int i = 0; i < 1; i++) {
+        list_points->push_back(new Point( width * (double)rand()/(double)RAND_MAX , height * (double)rand()/(double)RAND_MAX )); 
+    }
 
-    //Point* C = new Point(1,2);
-    //Point* D = new Point(4,5);
-    //Point* C = new Point(4,5);
-    //Point* D = new Point(5,6);
-    Point* C = new Point(2,3);
-    Point* D = new Point(9,4);
+    for (auto point = list_points->begin(); point != list_points->end(); point++) {
+        Point* new_data = *point;
 
-    //Point* C = new Point(2,3);
-    //Point* D = new Point(4,1);
+        std::cout << "x : " << new_data->x  << " | y : " << new_data->y << std::endl;
 
-    Edge* AB = new Edge(A, B);
-    Edge* CD = new Edge(C, D);
+    }
+    
+    std::cout << "Delaunay start" << std::endl;
+    list_edges = delaunay->DelaunayTriangulation(list_points);
+    std::cout << "Delaunay done" << std::endl;
 
-    bool verdict = delaunay->GetSegmentsIntersection(AB, CD);
+    std::cout << "list_edges size : " << list_edges->size() << std::endl;
 
     std::cout << "Execution done" << std::endl;
 }

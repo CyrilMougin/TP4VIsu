@@ -12,4 +12,13 @@ public :
         x = data_x;
         y = data_y;
     }
+
+    static bool PointAreEqual(Point* a, Point* b) {
+        if(a->x == b->x && a->y == b->y) {
+            return true;
+        
+        }else {
+            return false;
+        }
+    }
 };

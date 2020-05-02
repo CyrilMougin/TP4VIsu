@@ -17,7 +17,7 @@ public:
         direction = new Point(b_data->x - a_data->x, b_data->y - a_data->y);
 
         // a = (yb - ya) / (xb - xa)
-        a = (b_data->x - a_data->x) / (a_data->y - b_data->y);
+        a = (b_data->y - a_data->y) / (b_data->x - a_data->x);
         // b = y - ax avec (x,y) coordonnees d'un point passant par la droite
         b = start->y - a * start->x;
     }
