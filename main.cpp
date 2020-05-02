@@ -1,6 +1,13 @@
-#include "delaunay/test.cpp"
+#include "delaunay/delaunay.h"
+
+del::Delaunay* delaunay;
 
 int main() {
+    std::cout << "Execution start" << std::endl;
+
+    using namespace del;
+
+    delaunay = new Delaunay();
 
     Point* A = new Point(1,1);
     Point* B = new Point(4,4);
@@ -11,14 +18,14 @@ int main() {
     //Point* D = new Point(5,6);
     Point* C = new Point(2,3);
     Point* D = new Point(9,4);
-    
+
     //Point* C = new Point(2,3);
     //Point* D = new Point(4,1);
 
     Edge* AB = new Edge(A, B);
     Edge* CD = new Edge(C, D);
 
-    bool verdict = GetSegmentsIntersection(AB, CD);
+    bool verdict = delaunay->GetSegmentsIntersection(AB, CD);
 
-    return 0;
+    std::cout << "Execution done" << std::endl;
 }

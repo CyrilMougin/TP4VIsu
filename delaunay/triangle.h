@@ -1,4 +1,5 @@
-#include <iostream>
+#include "point.h"
+#include "edge.h"
 
 class Triangle {
 public:
@@ -13,16 +14,12 @@ public:
 
     bool is_legal;  // Le traingle est 'legal'
     
-    // CONSTRUCTEUR
-    Triangle(Point* sa, Point* sb, Point* sc, bool is) {
-        A = sa;
-        B = sb;
-        C = sc;
+    // CONSTRUCTEURS
+    Triangle();
+    Triangle(Point* sa, Point* sb, Point* sc, bool is);
 
-        AB = new Edge(sa, sb);
-        BC = new Edge(sb, sc);
-        CA = new Edge(sc, sa);
-
-        is_legal = is;
-    }
+    // METHODES
+    static Point* GetCentreCercle(Triangle* tr);
+    static bool EdgesAreEqual(Edge* a, Edge* b);
 };
+
