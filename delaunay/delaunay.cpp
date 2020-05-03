@@ -71,6 +71,7 @@ std::list<Triangle*> Delaunay::SearchTriangle(Point* point) {
     Point* point_a = point;
     
     std::list<Triangle*> new_triangles;
+    std::list<Edge*> temp_list_edges;
 
     // Creer un nouveau triangle avec chaque arete deja existante
     for(auto e = list_edges->begin(); e != list_edges->end(); e++) {
@@ -97,6 +98,7 @@ std::list<Triangle*> Delaunay::SearchTriangle(Point* point) {
                                         
             if(GetSegmentsIntersection(edge_ab, *i) || GetSegmentsIntersection(edge_ca, *i)) {
                 is_intersection = true;
+                break;
             }
         }
 
@@ -105,30 +107,67 @@ std::list<Triangle*> Delaunay::SearchTriangle(Point* point) {
         // On ajoute le triangle si la condition precedente est verifiee
         if(!is_intersection) {
             new_triangles.push_back(new Triangle(point_a, point_b, point_c, true));
+
+            // Ajouter les nouvelles aretes
+            bool is_equal_ab, is_equal_ca = false;
+            for(auto edge = temp_list_edges.begin(); edge != temp_list_edges.end(); edge++) {
+                if(Triangle::EdgesAreEqual(edge_ab, *edge)) {
+                    is_equal_ab = true;
+                }
+                if(Triangle::EdgesAreEqual(edge_ca, *edge)) {
+                    is_equal_ca = true;
+                }
+            }
+
+            if(!is_equal_ab) {
+                //std::cout << "ca ajoute edge_ab" << std::endl;
+                temp_list_edges.push_back(edge_ab);
+            }
+            if(!is_equal_ca) {
+                //std::cout << "ca ajoute edge_ca" << std::endl;
+                temp_list_edges.push_back(edge_ca);
+            }
+
         }
 
+    }
+
+    //std::cout << "temp_list_edges size : " << temp_list_edges.size() << std::endl;
+
+    for(auto edge = temp_list_edges.begin(); edge != temp_list_edges.end(); edge++) {
+        list_edges->push_back(*edge);
     }
 
     return new_triangles;
 }
 
 std::list<Triangle*> Delaunay::SearchLegalEdge(std::list<Triangle*> triangles) {
+    //std::cout << "Start 'SearchLegalEdge' " << std::endl;
     std::list<Triangle*> triangles_to_recheck;
 
     // Verifie si l'arete est legale parmis les nouveaux triangles
     for(auto t = triangles.begin(); t != triangles.end(); t++) {
+        //std::cout << "1" << std::endl;
         Triangle* new_triangle = *t;
 
         Edge* AB = new_triangle->AB;
         Edge* BC = new_triangle->BC;
         Edge* CA = new_triangle->CA;
 
+        //std::cout << "Point A : " << new_triangle->A->x << ", " << new_triangle->A->y << std::endl;
+        //std::cout << "Point B : " << new_triangle->B->x << ", " << new_triangle->B->y << std::endl;
+        //std::cout << "Point C : " << new_triangle->C->x << ", " << new_triangle->C->y << std::endl;
+
         Quadrilateral* quadri;
 
         // Chercher l'ancienne arete dans la liste d'aretes
+        //std::cout << "2" << std::endl;
         Point* common_point;
 
-        bool is_equal_AB, is_equal_BC, is_equal_CA = false;
+        bool is_equal_AB = false;
+        bool is_equal_BC = false;
+        bool is_equal_CA = false;
+
         for(auto e = list_edges->begin(); e != list_edges->end(); e++) {
             if(Triangle::EdgesAreEqual(AB, *e)) {
                 is_equal_AB = true;
@@ -144,37 +183,61 @@ std::list<Triangle*> Delaunay::SearchLegalEdge(std::list<Triangle*> triangles) {
             }
         }
 
+        //std::cout << "is_equal_AB : " << is_equal_AB << " | is_equal_BC : " << is_equal_BC << " | is_equal_CA : " << is_equal_CA << std::endl;
+
         // Constituer le quadrilatere a verifier
+        //std::cout << "3" << std::endl;
         if(is_equal_AB) {
             common_point = GetPointFromTriangle(AB);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->A, new_triangle->C, new_triangle->B, common_point);
+            
+            } else {
+                std::cout << "Pas d'arete en commun, c'est un bord" << std::endl;
+                
+                break;
             }
-
         }
         if(is_equal_BC) {
             common_point = GetPointFromTriangle(BC);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->B, new_triangle->A, new_triangle->C, common_point);
-            }
 
+            } else {
+                std::cout << "Pas d'arete en commun, c'est un bord" << std::endl;
+                
+                break;
+            }
         }
         if(is_equal_CA) {
             common_point = GetPointFromTriangle(CA);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->C, new_triangle->B, new_triangle->A, common_point);
+
+            } else {
+                std::cout << "Pas d'arete en commun, c'est un bord" << std::endl;
+                
+                break;
             }
         }
 
+        //std::cout << "3.1" << std::endl;
+        //std::cout << "Point A : " << quadri->A->x << ", " << quadri->A->y << std::endl;
+        //std::cout << "Point B : " << quadri->B->x << ", " << quadri->B->y << std::endl;
+        //std::cout << "Point C : " << quadri->C->x << ", " << quadri->C->y << std::endl;
         Triangle* tr = new Triangle(quadri->A, quadri->B, quadri->C, true);
-
+        //std::cout << "3.2" << std::endl;
         Point* cercle = Triangle::GetCentreCercle(tr);
         double radius = GetLength(cercle, quadri->A);
+        double test_1 = GetLength(cercle, quadri->B);
+        double test_2 = GetLength(cercle, quadri->C);
 
         double edge = GetLength(cercle, quadri->D);
+
+        //std::cout << "Longeurs : " << radius << " | " << test_1 << " | " << test_2 << " | " << edge << std::endl;
 
         if(edge < radius) {
             std::cout << "Arete illegale" << std::endl;
@@ -193,8 +256,6 @@ std::list<Triangle*> Delaunay::SearchLegalEdge(std::list<Triangle*> triangles) {
         } else {
             std::cout << "Arete legale" << std::endl;
 
-            // Ajouter l'arete legale
-            list_edges->push_back(quadri->InternEdge);
         }
     }
 
@@ -264,18 +325,18 @@ bool Delaunay::GetSegmentsIntersection(Edge* a, Edge* b) {
         }
 
         if(are_equal) {
-            std::cout << "Pas d'intersection entre les deux aretes" << std::endl;
+            //std::cout << "Pas d'intersection entre les deux aretes" << std::endl;
 
             return false;
         
         }else {
-            std::cout << "Intersection entre les deux aretes" << std::endl;
+            //std::cout << "Intersection entre les deux aretes" << std::endl;
 
             return true;
         }
     
     }else {
-        std::cout << "Pas d'intersection entre les deux aretes" << std::endl;
+        //std::cout << "Pas d'intersection entre les deux aretes" << std::endl;
 
         return false;
     }   
@@ -309,7 +370,7 @@ Triangle* Delaunay::SetFirstTriangle(Points* list_points) {
         if(y > y_max) y_max = y;
     }
 
-    Point* point_a = new Point(x_min - 4, y_min - 2);
+    Point* point_a = new Point(x_min - 4, y_min - 4);
     Point* point_b = new Point(x_min - 2, 2 * (y_max + 2));
     Point* point_c = new Point(2 * (x_max + 2), y_min - 2);
 

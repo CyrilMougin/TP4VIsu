@@ -1,4 +1,5 @@
 #include <iostream>
+#include <exception>
 
 #include "triangle.h"
 
@@ -32,6 +33,8 @@ Point* Triangle::GetCentreCercle(Triangle* tr) {
     Point* p2 = tr->B;
     Point* p3 = tr->C;
 
+    Point* O;
+
     // Equation de mediatrices
     double a1 = - (p2->x - p1->x) / (p2->y - p1->y);
     double b1 = ((p2->x - p1->x) * (p2->x + p1->x)) / (2 * (p2->y - p1->y)) + (p2->y + p1->y) / 2;
@@ -40,12 +43,12 @@ Point* Triangle::GetCentreCercle(Triangle* tr) {
     double b2 = ((p3->x - p2->x) * (p3->x + p2->x)) / (2 * (p3->y - p2->y)) + (p3->y + p2->y) / 2;
 
     // Coordonee du centre
-    double xc = (b2 - b1) / (- a1 + a2);
+    double xc = (b1 - b2) / (a2 - a1);
     double yc = a1 * xc + b1;
 
-    Point* cercle = new Point(xc, yc);
+    O = new Point(xc, yc);     
     
-    return cercle;
+    return O;
 }
 
 bool Triangle::EdgesAreEqual(Edge* a, Edge* b) {
