@@ -18,4 +18,4 @@ Triangulation de Delaunay - méthode incrémentale :
 - [Bowyer Watson Algorithm](https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm)
 - [Intersection de deux segments](https://forums.commentcamarche.net/forum/affich-3376777-algo-detecter-deux-segments-qui-se-croisent)
 - [Determinant entre deux vecteurs](https://www.supinfo.com/articles/single/2051-determinant-vecteurs)
-
+- [Centre d'un cercle circonscrit](https://cral-perso.univ-lyon1.fr/labo/fc//Ateliers_archives/ateliers_2005-06/cercle_3pts.pdf)
