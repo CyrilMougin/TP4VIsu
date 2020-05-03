@@ -15,6 +15,7 @@ namespace del {
     public:
         // VARIABLES
         Edges* list_edges;                  // Liste des aretes
+        Edges* list_edges_deleted;                  // Liste des aretes
         Points* list_points;                // Liste des sommets
         Triangles* list_triangles;          // Liste des tiangles
 
@@ -28,7 +29,7 @@ namespace del {
         std::list<Triangle*> SearchTriangle(Point* point);                      // Retrourne les nouveaux triangles consitues a partir d'un point
         std::list<Triangle*> SearchLegalEdge(std::list<Triangle*> triangles);   // Verfie si les aretes d'un triangle sont legales ou non
         
-        Point* GetPointFromTriangle(Edge* common_edge);                         // Retourne le sommet oppose a l'arete commune
+        Point* GetPointFromTriangle(Edge* common_edge, Point* point);            // Retourne le sommet oppose a l'arete commune
         double GetLength(Point* a, Point* b);                                   // Calcule la distance entre deux points
         double GetDeterminant(Point* A, Point* B);                              // Calcule le determinant entre deux aretes
         bool GetSegmentsIntersection(Edge* a, Edge* b);                         // Verfie s'il y a une intersection (true) ou pas (false) entre deux aretes

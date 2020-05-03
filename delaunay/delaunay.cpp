@@ -29,7 +29,7 @@ Edges* Delaunay::DelaunayTriangulation(Points* list_sites) {
     // Initialiser la liste de triangles T
     list_triangles = new Triangles();
 
-    list_triangles->push_back(initial_triangle);
+    //list_triangles->push_back(initial_triangle);
 
     // Initialiser la liste de bords D
 	list_edges = new Edges();
@@ -37,6 +37,12 @@ Edges* Delaunay::DelaunayTriangulation(Points* list_sites) {
     list_edges->push_back(initial_triangle->AB);
     list_edges->push_back(initial_triangle->BC);
     list_edges->push_back(initial_triangle->CA);
+
+    list_edges_deleted = new Edges();
+
+    list_edges_deleted->push_back(initial_triangle->AB);
+    list_edges_deleted->push_back(initial_triangle->BC);
+    list_edges_deleted->push_back(initial_triangle->CA);    
 
     // Initialiser la liste de points P
     list_points = list_sites;
@@ -60,7 +66,7 @@ Edges* Delaunay::DelaunayTriangulation(Points* list_sites) {
 
         while(triangles_to_recheck.size() != 0) {
             // Verifier si les aretes sont legales
-            std::list<Triangle*> triangles_to_recheck = SearchLegalEdge(new_triangles);
+            std::list<Triangle*> triangles_to_recheck = SearchLegalEdge(triangles_to_recheck);
         }
     }
 
@@ -109,7 +115,9 @@ std::list<Triangle*> Delaunay::SearchTriangle(Point* point) {
             new_triangles.push_back(new Triangle(point_a, point_b, point_c, true));
 
             // Ajouter les nouvelles aretes
-            bool is_equal_ab, is_equal_ca = false;
+            bool is_equal_ab = false; 
+            bool is_equal_ca = false;
+
             for(auto edge = temp_list_edges.begin(); edge != temp_list_edges.end(); edge++) {
                 if(Triangle::EdgesAreEqual(edge_ab, *edge)) {
                     is_equal_ab = true;
@@ -158,7 +166,7 @@ std::list<Triangle*> Delaunay::SearchLegalEdge(std::list<Triangle*> triangles) {
         //std::cout << "Point B : " << new_triangle->B->x << ", " << new_triangle->B->y << std::endl;
         //std::cout << "Point C : " << new_triangle->C->x << ", " << new_triangle->C->y << std::endl;
 
-        Quadrilateral* quadri;
+        Quadrilateral* quadri = new Quadrilateral();
 
         // Chercher l'ancienne arete dans la liste d'aretes
         //std::cout << "2" << std::endl;
@@ -170,14 +178,20 @@ std::list<Triangle*> Delaunay::SearchLegalEdge(std::list<Triangle*> triangles) {
 
         for(auto e = list_edges->begin(); e != list_edges->end(); e++) {
             if(Triangle::EdgesAreEqual(AB, *e)) {
+                std::cout << "Edge : " << new_triangle->A->x << ", " << new_triangle->A->y << " | " 
+                << new_triangle->B->x << ", " << new_triangle->B->y << std::endl;
                 is_equal_AB = true;
                 break;
             }
             if(Triangle::EdgesAreEqual(BC, *e)) {
+                std::cout << "Edge : " << new_triangle->B->x << ", " << new_triangle->B->y << " | " 
+                << new_triangle->C->x << ", " << new_triangle->C->y << std::endl;
                 is_equal_BC = true;
                 break;
             }
             if(Triangle::EdgesAreEqual(CA, *e)) {
+                std::cout << "Edge : " << new_triangle->C->x << ", " << new_triangle->C->y << " | " 
+                << new_triangle->A->x << ", " << new_triangle->A->y << std::endl;
                 is_equal_CA = true;
                 break;
             }
@@ -188,93 +202,145 @@ std::list<Triangle*> Delaunay::SearchLegalEdge(std::list<Triangle*> triangles) {
         // Constituer le quadrilatere a verifier
         //std::cout << "3" << std::endl;
         if(is_equal_AB) {
-            common_point = GetPointFromTriangle(AB);
+            common_point = GetPointFromTriangle(AB, new_triangle->C);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->A, new_triangle->C, new_triangle->B, common_point);
             
             } else {
                 std::cout << "Pas d'arete en commun, c'est un bord" << std::endl;
-                
-                break;
             }
         }
         if(is_equal_BC) {
-            common_point = GetPointFromTriangle(BC);
+            common_point = GetPointFromTriangle(BC, new_triangle->A);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->B, new_triangle->A, new_triangle->C, common_point);
 
             } else {
                 std::cout << "Pas d'arete en commun, c'est un bord" << std::endl;
-                
-                break;
             }
         }
         if(is_equal_CA) {
-            common_point = GetPointFromTriangle(CA);
+            common_point = GetPointFromTriangle(CA, new_triangle->B);
 
             if(common_point) {
                 quadri = new Quadrilateral(new_triangle->C, new_triangle->B, new_triangle->A, common_point);
 
             } else {
                 std::cout << "Pas d'arete en commun, c'est un bord" << std::endl;
-                
-                break;
             }
         }
 
-        //std::cout << "3.1" << std::endl;
-        //std::cout << "Point A : " << quadri->A->x << ", " << quadri->A->y << std::endl;
-        //std::cout << "Point B : " << quadri->B->x << ", " << quadri->B->y << std::endl;
-        //std::cout << "Point C : " << quadri->C->x << ", " << quadri->C->y << std::endl;
-        Triangle* tr = new Triangle(quadri->A, quadri->B, quadri->C, true);
-        //std::cout << "3.2" << std::endl;
-        Point* cercle = Triangle::GetCentreCercle(tr);
-        double radius = GetLength(cercle, quadri->A);
-        double test_1 = GetLength(cercle, quadri->B);
-        double test_2 = GetLength(cercle, quadri->C);
+        if(quadri->A) {
+            //std::cout << "3.1" << std::endl;
+            //std::cout << "Point A : " << quadri->A->x << ", " << quadri->A->y << std::endl;
+            //std::cout << "Point B : " << quadri->B->x << ", " << quadri->B->y << std::endl;
+            //std::cout << "Point C : " << quadri->C->x << ", " << quadri->C->y << std::endl;
 
-        double edge = GetLength(cercle, quadri->D);
+            Triangle* tr = new Triangle(quadri->A, quadri->B, quadri->C, true);
+            //std::cout << "3.2" << std::endl;
+            Point* cercle = Triangle::GetCentreCercle(tr);
+            double radius = GetLength(cercle, quadri->A);
+            double test_1 = GetLength(cercle, quadri->B);
+            double test_2 = GetLength(cercle, quadri->C);
 
-        //std::cout << "Longeurs : " << radius << " | " << test_1 << " | " << test_2 << " | " << edge << std::endl;
+            double edge = GetLength(cercle, quadri->D);
 
-        if(edge < radius) {
-            std::cout << "Arete illegale" << std::endl;
+            //std::cout << "Longeurs : " << radius << " | " << test_1 << " | " << test_2 << " | " << edge << std::endl;
 
-            // Supprimer l'arrete illegale
-            list_edges->erase(std::find(list_edges->begin(), list_edges->end(), quadri->InternEdge));
+            if(edge < radius) {
+                std::cout << "Arete illegale" << std::endl;
 
-            // Ajouter l'arete legale
-            quadri->InternEdge = new Edge(quadri->B, quadri->D);
-            list_edges->push_back(quadri->InternEdge);
+                // Supprimer l'arrete illegale
+                std::cout << "1" << std::endl;
+                for(auto e = list_edges->begin(); e != list_edges->end(); e++) {
+                    if(Triangle::EdgesAreEqual(quadri->InternEdge, *e)) {
+                        list_edges->erase(std::find(list_edges->begin(), list_edges->end(), *e));
+                        break;
+                    }
+                }
+                std::cout << "2" << std::endl;
+                // Ajouter l'arete legale
+                quadri->InternEdge = new Edge(quadri->B, quadri->D);
+                list_edges->push_back(quadri->InternEdge);
 
-            // Ajouter les triangles a verifier suite a la modification
-            triangles_to_recheck.push_back(new Triangle(quadri->A, quadri->B, quadri->C, false));
-            triangles_to_recheck.push_back(new Triangle(quadri->A, quadri->C, quadri->D, false));
+                // Ajouter les triangles a verifier suite a la modification
+                triangles_to_recheck.push_back(new Triangle(quadri->A, quadri->B, quadri->C, false));
+                triangles_to_recheck.push_back(new Triangle(quadri->A, quadri->C, quadri->D, false));
 
-        } else {
-            std::cout << "Arete legale" << std::endl;
+            } else {
+                std::cout << "Arete legale" << std::endl;
 
+            }
         }
+
+        list_triangles->push_back(new_triangle);
     }
 
     return triangles_to_recheck;
 }
 
-Point* Delaunay::GetPointFromTriangle(Edge* common_edge) {
+Point* Delaunay::GetPointFromTriangle(Edge* common_edge, Point* point) {
     // Retourne le triangle ayant l'arete en commun s'il y en a un
+
+    std::cout << "list_triangles size : " << list_triangles->size() << std::endl;
+
     for(auto t = list_triangles->begin(); t != list_triangles->end(); t++) {
         Triangle* new_triangle = *t;
 
         if(Triangle::EdgesAreEqual(new_triangle->AB, common_edge)) {
-            return new_triangle->C;
+            Point* v1 = new Point(point->x - new_triangle->B->x, point->y - new_triangle->B->y);
+            Point* v2 = new_triangle->BC->direction;
+
+            Point* v3 = new_triangle->AB->direction;
+
+            double a = (new_triangle->B->y - point->y) / (new_triangle->B->x - point->x);
+
+            //std::cout << "Point A : " << new_triangle->A->x << ", " << new_triangle->A->y << std::endl;
+            //std::cout << "Point B : " << new_triangle->B->x << ", " << new_triangle->B->y << std::endl;
+            //std::cout << "Point C : " << new_triangle->C->x << ", " << new_triangle->C->y << std::endl;
+            
+            if((v1->x < 0 && v2->x > 0) || (v1->x > 0 && v2->x < 0) || (v1->y < 0 && v2->y > 0) || (v1->y > 0 && v2->y < 0)) {
+                if((new_triangle->AB->a < new_triangle->BC->a && new_triangle->B->x > a) ||
+                (new_triangle->AB->a > new_triangle->BC->a && new_triangle->B->x < a)) {
+                    return new_triangle->C;
+                }
+            }
         }
         if(Triangle::EdgesAreEqual(new_triangle->BC, common_edge)) {
-            return new_triangle->A;
+            Point* v1 = new Point(point->x - new_triangle->C->x, point->y - new_triangle->C->y);
+            Point* v2 = new_triangle->CA->direction;
+
+            double a = (new_triangle->C->y - point->y) / (new_triangle->C->x - point->x);
+
+            //std::cout << "Point A : " << new_triangle->A->x << ", " << new_triangle->A->y << std::endl;
+            //std::cout << "Point B : " << new_triangle->B->x << ", " << new_triangle->B->y << std::endl;
+            //std::cout << "Point C : " << new_triangle->C->x << ", " << new_triangle->C->y << std::endl;
+
+            if((v1->x < 0 && v2->x > 0) || (v1->x > 0 && v2->x < 0) || (v1->y < 0 && v2->y > 0) || (v1->y > 0 && v2->y < 0)) {
+                if((new_triangle->BC->a < new_triangle->CA->a && new_triangle->BC->a > a) ||
+                (new_triangle->BC->a > new_triangle->CA->a && new_triangle->BC->a < a)) {
+                    return new_triangle->A;
+                }
+            }
         }
         if(Triangle::EdgesAreEqual(new_triangle->CA, common_edge)) {
-            return new_triangle->B;
+            Point* v1 = new Point(point->x - new_triangle->A->x, point->y - new_triangle->A->y);
+            Point* v2 = new_triangle->AB->direction;
+
+            double a = (new_triangle->A->y - point->y) / (new_triangle->A->x - point->x);
+
+            //std::cout << "Point A : " << new_triangle->A->x << ", " << new_triangle->A->y << std::endl;
+            //std::cout << "Point B : " << new_triangle->B->x << ", " << new_triangle->B->y << std::endl;
+            //std::cout << "Point C : " << new_triangle->C->x << ", " << new_triangle->C->y << std::endl;
+
+            if((v1->x < 0 && v2->x > 0) || (v1->x > 0 && v2->x < 0) || (v1->y < 0 && v2->y > 0) || (v1->y > 0 && v2->y < 0)) {
+                if((new_triangle->CA->a < new_triangle->AB->a && new_triangle->CA->a > a) ||
+                (new_triangle->CA->a > new_triangle->AB->a && new_triangle->CA->a < a)) {
+                    return new_triangle->B;
+                }
+            }
         }
     }
 

@@ -16,6 +16,20 @@ public:
     Edge* InternEdge;
 
     // CONSTRUCTEUR
+    Quadrilateral() {
+        A = 0;
+        B = 0;
+        C = 0;
+        D = 0;
+
+        AB = 0;
+        BC = 0;
+        CD = 0;
+        DA = 0;
+        
+        InternEdge = 0;
+    }
+    
     Quadrilateral(Point* pa, Point* pb, Point* pc, Point* pd) {
         A = pa;
         B = pb;
